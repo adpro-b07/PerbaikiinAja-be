@@ -2,6 +2,7 @@
 FROM gradle:8.3-jdk17 AS builder
 WORKDIR /app
 COPY . .
+RUN chmod +x ./gradlew
 RUN ./gradlew bootJar
 
 # Stage 2: run jar

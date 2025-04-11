@@ -2,6 +2,7 @@ package com.advprog.perbaikiinaja.service;
 
 import com.advprog.perbaikiinaja.model.Order;
 import com.advprog.perbaikiinaja.model.OrderStatus;
+import com.advprog.perbaikiinaja.observer.OrderEventPublisher;
 import com.advprog.perbaikiinaja.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

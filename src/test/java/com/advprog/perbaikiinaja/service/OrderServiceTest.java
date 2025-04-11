@@ -1,6 +1,7 @@
 package com.advprog.perbaikiinaja.service;
 
 import com.advprog.perbaikiinaja.model.Order;
+import com.advprog.perbaikiinaja.model.OrderStatus;
 import com.advprog.perbaikiinaja.repository.OrderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,11 +9,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class OrderServiceTest {
     @Mock

@@ -32,4 +32,18 @@ public class CouponController {
         Optional<Coupon> coupon = couponService.getCouponByCode(code);
         return coupon.orElseThrow(() -> new IllegalArgumentException("Coupon not found"));
     }
+
+    @PutMapping("/{code}")
+    public Coupon updateCoupon(
+            @PathVariable String code,
+            @RequestParam double discount,
+            @RequestParam int maxUsage) {
+
+        return couponService.updateCoupon(code, discount, maxUsage);
+    }
+
+    @DeleteMapping("/{code}")
+    public void deleteCoupon(@PathVariable String code) {
+        couponService.deleteCoupon(code);
+    }
 }

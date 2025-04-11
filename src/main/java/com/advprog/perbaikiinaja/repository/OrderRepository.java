@@ -1,12 +1,14 @@
 package com.advprog.perbaikiinaja.repository;
 
 import com.advprog.perbaikiinaja.model.Order;
+import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Repository
 public class OrderRepository {
     private final Map<String, Order> orders = new HashMap<>();
 

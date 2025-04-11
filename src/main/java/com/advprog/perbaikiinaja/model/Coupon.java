@@ -1,5 +1,10 @@
 package com.advprog.perbaikiinaja.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class Coupon {
     private String code;
     private double discount;
@@ -16,17 +21,5 @@ public class Coupon {
         this.code = code;
         this.discount = discount;
         this.maxUsage = maxUsage;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public double getDiscount() {
-        return discount;
-    }
-
-    public int getMaxUsage() {
-        return maxUsage;
     }
 }

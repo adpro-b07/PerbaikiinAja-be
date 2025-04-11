@@ -14,6 +14,18 @@ public class Report {
     private LocalDateTime createdAt;
 
     public Report(String id, String technicianId, String description, String status, LocalDateTime createdAt) {
+    this.id = id;
+    this.technicianId = technicianId;
+    
+    if (description == null || description.isEmpty()) {
+        throw new IllegalArgumentException("Deskripsi tidak boleh kosong");
+    }
+    if (status == null) {
+        throw new IllegalArgumentException("Status laporan tidak boleh null");
+    }
+    this.description = description;
+    this.status = status;
+    this.createdAt = createdAt;
     }
 
 }

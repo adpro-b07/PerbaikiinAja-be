@@ -54,4 +54,17 @@ public class OrderServiceTest {
         verify(orderRepo).save(order);
     }
 
+    @Test
+    void getOrdersForTechnician_shouldReturnCorrectOrders() {
+        Order order1 = new Order(); order1.setTechnicianId("tech123");
+        Order order2 = new Order(); order2.setTechnicianId("tech123");
+
+        when(technicianService.isTechnicianActive("tech123")).thenReturn(true);
+        when(orderRepo.findByTechnicianId("tech123")).thenReturn(List.of(order1, order2));
+
+        List<Order> result = orderService.getOrdersForTechnician("tech123");
+
+        assertEquals(2, result.size());
+        assertEquals("tech123", result.get(0).getTechnicianId());
+    }
 }

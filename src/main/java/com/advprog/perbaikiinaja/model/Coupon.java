@@ -1,10 +1,12 @@
 package com.advprog.perbaikiinaja.model;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Data
 public class Coupon {
     private String code;
     private double discount;

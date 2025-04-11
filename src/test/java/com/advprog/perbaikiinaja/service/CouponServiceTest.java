@@ -61,4 +61,53 @@ public class CouponServiceTest {
 
         assertEquals(2, result.size());
     }
+
+    @Test
+    public void testUpdateCouponSuccess() {
+        // Setup kupon awal
+        Coupon oldCoupon = new Coupon("UPDATE123", 10.0, 5);
+        when(couponRepository.findByCode("UPDATE123")).thenReturn(Optional.of(oldCoupon));
+        when(couponRepository.save(any(Coupon.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Lakukan update
+        Coupon updated = couponService.updateCoupon("UPDATE123", 20.0, 10);
+
+        assertEquals("UPDATE123", updated.getCode());
+        assertEquals(20.0, updated.getDiscount());
+        assertEquals(10, updated.getMaxUsage());
+
+        verify(couponRepository, times(1)).save(updated);
+    }
+
+    @Test
+    public void testUpdateCouponNotFound() {
+        when(couponRepository.findByCode("NOTFOUND")).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            couponService.updateCoupon("NOTFOUND", 20.0, 10);
+        });
+
+        assertEquals("Kupon dengan kode NOTFOUND tidak ditemukan.", exception.getMessage());
+    }
+
+    @Test
+    public void testDeleteCouponSuccess() {
+        Coupon coupon = new Coupon("DEL123", 15.0, 5);
+        when(couponRepository.findByCode("DEL123")).thenReturn(Optional.of(coupon));
+
+        couponService.deleteCoupon("DEL123");
+
+        verify(couponRepository, times(1)).deleteByCode("DEL123");
+    }
+
+    @Test
+    public void testDeleteCouponNotFound() {
+        when(couponRepository.findByCode("MISSING")).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            couponService.deleteCoupon("MISSING");
+        });
+
+        assertEquals("Kupon tidak ditemukan", exception.getMessage());
+    }
 }

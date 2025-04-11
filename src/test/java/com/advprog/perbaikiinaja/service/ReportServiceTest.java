@@ -48,6 +48,28 @@ public class ReportServiceTest {
     }
 
     @Test
+    void createReport_shouldSaveCorrectlyIfOrderIsSelesai() {
+        Report report = new Report();
+        report.setOrderId("order123");
+        report.setTechnicianId("tech123");
+        report.setDescription("Ganti layar");
+        report.setFinalPrice(200000L);
+
+        Order order = new Order();
+        order.setId("order123");
+        order.setStatus(OrderStatus.SELESAI);
+
+        when(orderRepo.findById("order123")).thenReturn(Optional.of(order));
+        when(reportRepo.save(report)).thenReturn(report);
+
+        Report saved = reportService.createReport(report);
+
+        assertEquals("order123", saved.getOrderId());
+        verify(reportRepo).save(report);
+    }
+
+
+    @Test
     void createReport_shouldThrowExceptionIfOrderNotSelesai() {
         Report report = new Report();
         report.setOrderId("order456");

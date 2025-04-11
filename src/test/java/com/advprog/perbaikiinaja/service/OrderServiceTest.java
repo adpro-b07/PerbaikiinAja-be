@@ -36,4 +36,21 @@ public class OrderServiceTest {
             orderService.getOrdersForTechnician("t1");
         });
     }
+
+    @Test
+    void updateEstimation_shouldUpdateFieldsAndNotifyObserver() {
+        Order order = new Order();
+        order.setId("123");
+        order.setStatus(OrderStatus.MENUNGGU_ESTIMASI);
+
+        when(orderRepo.findById("123")).thenReturn(Optional.of(order));
+
+        orderService.updateEstimation("123", 3, 150000L);
+
+        assertEquals(3, order.getEstimatedHours());
+        assertEquals(150000L, order.getEstimatedPrice());
+        assertEquals(OrderStatus.MENUNGGU_KONFIRMASI_PENGGUNA, order.getStatus());
+        verify(orderRepo).save(order);
+    }
+
 }

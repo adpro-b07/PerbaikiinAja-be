@@ -46,4 +46,21 @@ public class ReportServiceTest {
         assertEquals("tech123", saved.getTechnicianId());
         verify(reportRepo).save(report);
     }
+
+    @Test
+    void createReport_shouldThrowExceptionIfOrderNotSelesai() {
+        Report report = new Report();
+        report.setOrderId("order456");
+
+        Order order = new Order();
+        order.setId("order456");
+        order.setStatus(OrderStatus.DALAM_PROSES);  // status = belum selesai
+
+        when(orderRepo.findById("order456")).thenReturn(Optional.of(order));
+
+        assertThrows(IllegalStateException.class, () -> {
+            reportService.createReport(report);
+        });
+    }
+
 }

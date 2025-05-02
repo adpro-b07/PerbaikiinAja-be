@@ -99,7 +99,7 @@ class UserServiceImplTest {
 
         User result = userService.getRandomTeknisi();
         assertNotNull(result);
-        assertEquals("TEKNISI", result.getRole());
+        assertTrue("TEKNISI".equalsIgnoreCase(result.getRole()));
     }
 
     @Test

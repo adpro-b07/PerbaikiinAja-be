@@ -30,13 +30,13 @@ public class PaymentMethodRepositoryTest {
     }
 
     @Test
-    public void testDeleteByName() {
-        repository.deleteByName("Bank A");
-        assertFalse(repository.existsByName("Bank A"));
+    public void testExistsByName() {
+        assertTrue(repository.existsByName("Transfer"));
     }
 
     @Test
-    public void testExistsByName() {
-        assertTrue(repository.existsByName("Bank A"));
+    public void testDeleteByName() {
+        repository.deleteByName("Transfer");
+        assertFalse(repository.existsByName("Transfer"));
     }
 }

@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 class TeknisiServiceImplTest {
 
     @InjectMocks
-    private TeknisiService teknisiService;
+    private TeknisiServiceImpl teknisiService;
 
     @Mock
     private UserRepository userRepository;

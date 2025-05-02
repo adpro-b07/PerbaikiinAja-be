@@ -1,6 +1,5 @@
 package com.advprog.perbaikiinaja.service;
 
-import com.advprog.perbaikiinaja.factory.CouponFactory;
 import com.advprog.perbaikiinaja.model.Coupon;
 import com.advprog.perbaikiinaja.repository.CouponRepository;
 import org.junit.jupiter.api.BeforeEach;

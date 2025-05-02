@@ -2,10 +2,7 @@ package com.advprog.perbaikiinaja.controller;
 
 import com.advprog.perbaikiinaja.model.Coupon;
 import com.advprog.perbaikiinaja.service.CouponService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -29,7 +26,6 @@ public class CouponControllerTest {
     @MockitoBean
     private CouponService couponService;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     public void testGetAllCoupons() throws Exception {

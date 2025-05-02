@@ -2,7 +2,6 @@ package com.advprog.perbaikiinaja.controller;
 
 import com.advprog.perbaikiinaja.model.Report;
 import com.advprog.perbaikiinaja.service.ReportService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,11 +23,9 @@ public class ReportControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
+    
     @MockBean
     private ReportService reportService;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {

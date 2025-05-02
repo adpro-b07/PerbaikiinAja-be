@@ -1,5 +1,7 @@
 package com.advprog.perbaikiinaja.model;
 
+import java.time.LocalDate;
+
 import lombok.Data;
 
 @Data
@@ -12,7 +14,11 @@ public class Order {
     private int estimatedHours;
     private long estimatedPrice;
     private OrderStatus status;
-    private String paymentMethod;
+    
+    private String repairDescription;
+    private LocalDate serviceDate;
+    private String coupon; // Optional coupon code
+    private PaymentMethod paymentMethod;
 
     public Order() {
         this.status = OrderStatus.MENUNGGU_ESTIMASI;

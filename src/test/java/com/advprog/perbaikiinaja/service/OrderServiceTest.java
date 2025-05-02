@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,5 +67,23 @@ public class OrderServiceTest {
 
         assertEquals(2, result.size());
         assertEquals("tech123", result.get(0).getTechnicianId());
+    }
+
+    @Test
+    void getOrdersForCustomer_shouldReturnCustomerOrders() {
+        OrderRepository repo = mock(OrderRepository.class);
+        TechnicianService techService = mock(TechnicianService.class);
+        OrderServiceImpl service = new OrderServiceImpl(repo, techService);
+
+        Order o1 = new Order(); o1.setCustomerId("c1");
+        Order o2 = new Order(); o2.setCustomerId("c1");
+        List<Order> expected = Arrays.asList(o1, o2);
+
+        when(repo.findByCustomerId("c1")).thenReturn(expected);
+
+        List<Order> result = service.getOrdersForCustomer("c1");
+
+        assertEquals(2, result.size());
+        assertEquals(expected, result);
     }
 }

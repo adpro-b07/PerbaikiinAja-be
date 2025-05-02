@@ -1,31 +1,15 @@
 package com.advprog.perbaikiinaja.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.advprog.perbaikiinaja.repository.PaymentMethodRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.*;
 
-import com.advprog.perbaikiinaja.model.PaymentMethod;
-import com.advprog.perbaikiinaja.repository.PaymentMethodRepository;
+import java.util.List;
 
-@ExtendWith(MockitoExtension.class)
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 public class PaymentMethodServiceImplTest {
 
     @Mock
@@ -34,217 +18,113 @@ public class PaymentMethodServiceImplTest {
     @InjectMocks
     private PaymentMethodServiceImpl paymentMethodService;
 
-    private PaymentMethod paymentMethod;
-    private String userId;
-    private String paymentMethodId;
-
     @BeforeEach
-    void setUp() {
-        userId = "user-123";
-        paymentMethodId = UUID.randomUUID().toString();
-        paymentMethod = new PaymentMethod(
-                paymentMethodId,
-                "BCA",
-                userId,
-                "1234567890",
-                true
-        );
+    public void setup() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void testCreatePaymentMethod() {
-        // Arrange
-        String name = "BCA";
-        String accountNumber = "1234567890";
-        
-        when(paymentMethodRepository.save(any(PaymentMethod.class))).thenReturn(paymentMethod);
+    public void testCreatePaymentMethodSuccess() {
+        when(paymentMethodRepository.existsByName("OVO")).thenReturn(false);
+        when(paymentMethodRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
-        // Act
-        PaymentMethod created = paymentMethodService.createPaymentMethod(name, accountNumber, userId);
+        PaymentMethod method = paymentMethodService.createPaymentMethod("OVO");
 
-        // Assert
-        assertNotNull(created);
-        assertEquals(name, created.getName());
-        assertEquals(accountNumber, created.getAccountNumber());
-        assertEquals(userId, created.getUserId());
-        assertTrue(created.isActive());
-        verify(paymentMethodRepository).save(any(PaymentMethod.class));
+        assertNotNull(method.getId());
+        assertEquals("OVO", method.getName());
+        verify(paymentMethodRepository).save(any());
     }
 
     @Test
-    void testGetAllPaymentMethodsByUserId() {
-        // Arrange
-        List<PaymentMethod> paymentMethods = new ArrayList<>();
-        paymentMethods.add(paymentMethod);
-        
-        PaymentMethod anotherUserPaymentMethod = new PaymentMethod(
-                UUID.randomUUID().toString(),
-                "Mandiri",
-                "another-user",
-                "0987654321",
-                true
-        );
-        
-        List<PaymentMethod> allPaymentMethods = new ArrayList<>(paymentMethods);
-        allPaymentMethods.add(anotherUserPaymentMethod);
-        
-        when(paymentMethodRepository.findAll()).thenReturn(allPaymentMethods);
+    public void testCreatePaymentMethodDuplicate() {
+        when(paymentMethodRepository.existsByName("OVO")).thenReturn(true);
 
-        // Act
-        List<PaymentMethod> result = paymentMethodService.getAllPaymentMethodsByUserId(userId);
-
-        // Assert
-        assertEquals(1, result.size());
-        assertEquals(paymentMethod, result.get(0));
-        verify(paymentMethodRepository).findAll();
+        assertThrows(RuntimeException.class, () ->
+                paymentMethodService.createPaymentMethod("OVO"));
     }
 
     @Test
-    void testGetPaymentMethodById_Found() {
-        // Arrange
-        when(paymentMethodRepository.findById(paymentMethodId)).thenReturn(Optional.of(paymentMethod));
+    public void testGetPaymentMethodById() {
+        PaymentMethod method = new PaymentMethod("1", "Gopay");
+        when(paymentMethodRepository.findById("1")).thenReturn(method);
 
-        // Act
-        PaymentMethod result = paymentMethodService.getPaymentMethodById(paymentMethodId);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(paymentMethodId, result.getId());
-        verify(paymentMethodRepository).findById(paymentMethodId);
+        PaymentMethod found = paymentMethodService.getPaymentMethodById("1");
+        assertEquals("Gopay", found.getName());
     }
 
     @Test
-    void testGetPaymentMethodById_NotFound() {
-        // Arrange
-        String nonExistentId = "non-existent-id";
-        when(paymentMethodRepository.findById(nonExistentId)).thenReturn(Optional.empty());
+    public void testGetPaymentMethodByName() {
+        PaymentMethod method = new PaymentMethod("1", "Dana");
+        when(paymentMethodRepository.findAll()).thenReturn(List.of(method));
 
-        // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            paymentMethodService.getPaymentMethodById(nonExistentId);
-        });
-        
-        assertEquals("Payment method not found with ID: " + nonExistentId, exception.getMessage());
-        verify(paymentMethodRepository).findById(nonExistentId);
+        PaymentMethod found = paymentMethodService.getPaymentMethodByName("Dana");
+        assertNotNull(found);
+        assertEquals("Dana", found.getName());
     }
 
     @Test
-    void testUpdatePaymentMethod() {
-        // Arrange
-        String newName = "BNI";
-        String newAccountNumber = "5555555555";
-        
-        PaymentMethod updatedPaymentMethod = new PaymentMethod(
-                paymentMethodId,
-                newName,
-                userId,
-                newAccountNumber,
-                true
-        );
-        
-        when(paymentMethodRepository.findById(paymentMethodId)).thenReturn(Optional.of(paymentMethod));
-        when(paymentMethodRepository.save(any(PaymentMethod.class))).thenReturn(updatedPaymentMethod);
+    public void testGetPaymentMethodByNameNotFound() {
+        when(paymentMethodRepository.findAll()).thenReturn(List.of());
 
-        // Act
-        PaymentMethod result = paymentMethodService.updatePaymentMethod(paymentMethodId, newName, newAccountNumber);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(paymentMethodId, result.getId());
-        assertEquals(newName, result.getName());
-        assertEquals(newAccountNumber, result.getAccountNumber());
-        assertEquals(userId, result.getUserId());
-        verify(paymentMethodRepository).findById(paymentMethodId);
-        verify(paymentMethodRepository).save(any(PaymentMethod.class));
+        PaymentMethod found = paymentMethodService.getPaymentMethodByName("Nonexistent");
+        assertNull(found);
     }
 
     @Test
-    void testDeletePaymentMethod_Exists() {
-        // Arrange
-        when(paymentMethodRepository.existsById(paymentMethodId)).thenReturn(true);
-        doNothing().when(paymentMethodRepository).deleteById(paymentMethodId);
+    public void testUpdatePaymentMethodSuccess() {
+        PaymentMethod oldMethod = new PaymentMethod("1", "LinkAja");
+        when(paymentMethodRepository.findAll()).thenReturn(List.of(oldMethod));
+        when(paymentMethodRepository.existsByName("LinkAja")).thenReturn(true);
+        when(paymentMethodRepository.existsByName("ShopeePay")).thenReturn(false);
+        when(paymentMethodRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
-        // Act
-        paymentMethodService.deletePaymentMethod(paymentMethodId);
+        PaymentMethod updated = paymentMethodService.updatePaymentMethod("LinkAja", "ShopeePay");
 
-        // Assert
-        verify(paymentMethodRepository).existsById(paymentMethodId);
-        verify(paymentMethodRepository).deleteById(paymentMethodId);
+        assertEquals("ShopeePay", updated.getName());
     }
 
     @Test
-    void testDeletePaymentMethod_NotExists() {
-        // Arrange
-        String nonExistentId = "non-existent-id";
-        when(paymentMethodRepository.existsById(nonExistentId)).thenReturn(false);
+    public void testUpdatePaymentMethodTargetExists() {
+        PaymentMethod method = new PaymentMethod("1", "LinkAja");
+        when(paymentMethodRepository.findAll()).thenReturn(List.of(method));
+        when(paymentMethodRepository.existsByName("ShopeePay")).thenReturn(true);
 
-        // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            paymentMethodService.deletePaymentMethod(nonExistentId);
-        });
-        
-        assertEquals("Payment method not found with ID: " + nonExistentId, exception.getMessage());
-        verify(paymentMethodRepository).existsById(nonExistentId);
-        verify(paymentMethodRepository, never()).deleteById(anyString());
+        assertThrows(RuntimeException.class, () ->
+                paymentMethodService.updatePaymentMethod("LinkAja", "ShopeePay"));
     }
 
     @Test
-    void testActivatePaymentMethod() {
-        // Arrange
-        PaymentMethod inactivePaymentMethod = new PaymentMethod(
-                paymentMethodId,
-                "BCA",
-                userId,
-                "1234567890",
-                false
-        );
-        
-        PaymentMethod activatedPaymentMethod = new PaymentMethod(
-                paymentMethodId,
-                "BCA",
-                userId,
-                "1234567890",
-                true
-        );
-        
-        when(paymentMethodRepository.findById(paymentMethodId)).thenReturn(Optional.of(inactivePaymentMethod));
-        when(paymentMethodRepository.save(any(PaymentMethod.class))).thenReturn(activatedPaymentMethod);
+    public void testUpdatePaymentMethodNotFound() {
+        when(paymentMethodRepository.findAll()).thenReturn(List.of());
 
-        // Act
-        paymentMethodService.activatePaymentMethod(paymentMethodId);
-
-        // Assert
-        verify(paymentMethodRepository).findById(paymentMethodId);
-        verify(paymentMethodRepository).save(any(PaymentMethod.class));
+        assertThrows(RuntimeException.class, () ->
+                paymentMethodService.updatePaymentMethod("BCA", "BNI"));
     }
 
     @Test
-    void testDeactivatePaymentMethod() {
-        // Arrange
-        PaymentMethod activePaymentMethod = new PaymentMethod(
-                paymentMethodId,
-                "BCA",
-                userId,
-                "1234567890",
-                true
-        );
-        
-        PaymentMethod deactivatedPaymentMethod = new PaymentMethod(
-                paymentMethodId,
-                "BCA",
-                userId,
-                "1234567890",
-                false
-        );
-        
-        when(paymentMethodRepository.findById(paymentMethodId)).thenReturn(Optional.of(activePaymentMethod));
-        when(paymentMethodRepository.save(any(PaymentMethod.class))).thenReturn(deactivatedPaymentMethod);
+    public void testDeletePaymentMethodSuccess() {
+        when(paymentMethodRepository.existsByName("Mandiri")).thenReturn(true);
 
-        // Act
-        paymentMethodService.deactivatePaymentMethod(paymentMethodId);
+        paymentMethodService.deletePaymentMethod("Mandiri");
+        verify(paymentMethodRepository).deleteByName("Mandiri");
+    }
 
-        // Assert
-        verify(paymentMethodRepository).findById(paymentMethodId);
-        verify(paymentMethodRepository).save(any(PaymentMethod.class));
+    @Test
+    public void testDeletePaymentMethodNotFound() {
+        when(paymentMethodRepository.existsByName("Unknown")).thenReturn(false);
+
+        assertThrows(RuntimeException.class, () ->
+                paymentMethodService.deletePaymentMethod("Unknown"));
+    }
+
+    @Test
+    public void testGetAllPaymentMethods() {
+        when(paymentMethodRepository.findAll()).thenReturn(List.of(
+                new PaymentMethod("1", "A"), new PaymentMethod("2", "B")
+        ));
+
+        Iterable<PaymentMethod> all = paymentMethodService.getAllPaymentMethods();
+        assertNotNull(all);
+        assertEquals(2, ((List<PaymentMethod>) all).size());
     }
 }

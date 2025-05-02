@@ -3,6 +3,9 @@ package com.advprog.perbaikiinaja.model;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import java.time.LocalDate;
 
 public class OrderTest {
     @Test
@@ -46,4 +49,5 @@ public class OrderTest {
                 .build();
         order.setPaymentMethod(pm);
         assertEquals(pm, order.getPaymentMethod());
+    }
 }

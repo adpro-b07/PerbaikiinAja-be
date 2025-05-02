@@ -1,7 +1,7 @@
 package com.advprog.perbaikiinaja.model;
 
 public class Review {
-    private int reviewId;
+    private final int reviewId;
     private int userId;
     private int technicianId;
     private int rating;       // 1-5

@@ -1,12 +1,18 @@
 package com.advprog.perbaikiinaja.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class Report {
-    private String orderId;
-    private String technicianId;
-    private String description;
-    private Long finalPrice;
-    private String photoUrl;
-}
+    String ulasan;
+    int rating;
+    Pesanan pesanan;
+
+    public Report(String ulasan, int rating, Pesanan pesanan) {
+        this.ulasan = ulasan;
+        this.rating = rating;
+        this.pesanan = pesanan;
+    }
+}  

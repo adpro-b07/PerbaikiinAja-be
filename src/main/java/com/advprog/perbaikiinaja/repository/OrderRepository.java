@@ -22,6 +22,12 @@ public class OrderRepository {
                 .toList();
     }
 
+    public List<Order> findByCustomerId(String customerId) {
+        return orders.values().stream()
+                .filter(o -> customerId.equals(o.getCustomerId()))
+                .toList();
+    }
+
     public Order save(Order order) {
         orders.put(order.getId(), order);
         return order;

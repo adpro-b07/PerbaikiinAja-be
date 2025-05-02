@@ -42,4 +42,9 @@ public class OrderServiceImpl implements OrderService {
         // panggil observer (masih hardcode)
         OrderEventPublisher.getInstance().notify(order, order.getStatus());
     }
+
+    @Override
+    public List<Order> getOrdersForCustomer(String customerId) {
+        return orderRepo.findByCustomerId(customerId);
+    }
 }

@@ -8,5 +8,6 @@ public interface OrderService {
     List<Order> getOrdersForTechnician(String technicianId);
 
     void updateEstimation(String orderId, int hours, Long price);
-}
 
+    List<Order> getOrdersForCustomer(String customerId);
+}

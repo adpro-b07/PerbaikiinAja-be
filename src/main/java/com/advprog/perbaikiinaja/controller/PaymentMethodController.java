@@ -2,7 +2,6 @@ package com.advprog.perbaikiinaja.controller;
 
 import com.advprog.perbaikiinaja.model.PaymentMethod;
 import com.advprog.perbaikiinaja.service.PaymentMethodService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +16,6 @@ public class PaymentMethodController {
     
     private final PaymentMethodService paymentMethodService;
     
-    @Autowired
     public PaymentMethodController(PaymentMethodService paymentMethodService) {
         this.paymentMethodService = paymentMethodService;
     }

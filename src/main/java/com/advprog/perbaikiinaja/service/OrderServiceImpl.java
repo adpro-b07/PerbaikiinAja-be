@@ -4,7 +4,6 @@ import com.advprog.perbaikiinaja.model.Order;
 import com.advprog.perbaikiinaja.model.OrderStatus;
 import com.advprog.perbaikiinaja.observer.OrderEventPublisher;
 import com.advprog.perbaikiinaja.repository.OrderRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +13,6 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepo;
     private final TechnicianService technicianService;
 
-    @Autowired
     public OrderServiceImpl(OrderRepository orderRepo, TechnicianService technicianService) {
         this.orderRepo = orderRepo;
         this.technicianService = technicianService;

@@ -8,6 +8,9 @@ import com.advprog.perbaikiinaja.repository.ReportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class ReportServiceImpl implements ReportService {
 
@@ -31,5 +34,15 @@ public class ReportServiceImpl implements ReportService {
 
         return reportRepo.save(report);
     }
-
+    
+    @Override
+    public List<Report> getReports() {
+        // Menggunakan method findAll langsung dari ReportRepository
+        return reportRepo.findAll();
+    }
+    
+    @Override
+    public Optional<Report> findByOrderId(String orderId) {
+        return reportRepo.findByOrderId(orderId);
+    }
 }

@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,12 +38,23 @@ public class ReportControllerTest {
 
     @Test
     public void testGetAllReports() throws Exception {
-        List<Report> dummyList = List.of(
-                new Report("R1", "TECH1", "Kerusakan ringan", "WAITING", LocalDateTime.now()),
-                new Report("R2", "TECH2", "Rusak parah", "DONE", LocalDateTime.now())
-        );
+        // Membuat Report menggunakan setter bukan konstruktor
+        Report report1 = new Report();
+        report1.setOrderId("R1");
+        report1.setTechnicianId("TECH1");
+        report1.setDescription("Kerusakan ringan");
+        
+        Report report2 = new Report();
+        report2.setOrderId("R2");
+        report2.setTechnicianId("TECH2");
+        report2.setDescription("Rusak parah");
+        
+        List<Report> dummyList = new ArrayList<>();
+        dummyList.add(report1);
+        dummyList.add(report2);
 
-        when(reportService.findAllReports()).thenReturn(dummyList);
+        // Menggunakan method getReports() yang baru
+        when(reportService.getReports()).thenReturn(dummyList);
 
         mockMvc.perform(get("/api/reports"))
                 .andExpect(status().isOk())
@@ -51,9 +63,14 @@ public class ReportControllerTest {
 
     @Test
     public void testGetReportById() throws Exception {
-        Report report = new Report("RPT1", "TECH42", "Kipas bunyi keras", "WAITING", LocalDateTime.now());
+        // Membuat Report menggunakan setter bukan konstruktor
+        Report report = new Report();
+        report.setOrderId("RPT1");
+        report.setTechnicianId("TECH42");
+        report.setDescription("Kipas bunyi keras");
 
-        when(reportService.findReportById("RPT1")).thenReturn(Optional.of(report));
+        // Menggunakan method findByOrderId() yang baru
+        when(reportService.findByOrderId("RPT1")).thenReturn(Optional.of(report));
 
         mockMvc.perform(get("/api/reports/RPT1"))
                 .andExpect(status().isOk())

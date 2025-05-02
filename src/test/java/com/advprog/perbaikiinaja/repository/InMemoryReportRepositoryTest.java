@@ -4,7 +4,6 @@ import com.advprog.perbaikiinaja.model.Report;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,10 +20,16 @@ public class InMemoryReportRepositoryTest {
 
     @Test
     public void testSaveAndFindById() {
-        Report report = new Report("RPT001", "TECH01", "Kerusakan motherboard", "WAITING", LocalDateTime.now());
+        // Menggunakan setter alih-alih konstruktor
+        Report report = new Report();
+        report.setOrderId("RPT001");
+        report.setTechnicianId("TECH01");
+        report.setDescription("Kerusakan motherboard");
+        
         repository.save(report);
 
-        Optional<Report> result = repository.findById("RPT001");
+        // Menggunakan findByOrderId alih-alih findById
+        Optional<Report> result = repository.findByOrderId("RPT001");
 
         assertTrue(result.isPresent());
         assertEquals("TECH01", result.get().getTechnicianId());
@@ -32,8 +37,18 @@ public class InMemoryReportRepositoryTest {
 
     @Test
     public void testFindAll() {
-        repository.save(new Report("R1", "TECH1", "Deskripsi 1", "DONE", LocalDateTime.now()));
-        repository.save(new Report("R2", "TECH2", "Deskripsi 2", "WAITING", LocalDateTime.now()));
+        // Menggunakan setter alih-alih konstruktor
+        Report report1 = new Report();
+        report1.setOrderId("R1");
+        report1.setTechnicianId("TECH1");
+        report1.setDescription("Deskripsi 1");
+        repository.save(report1);
+        
+        Report report2 = new Report();
+        report2.setOrderId("R2");
+        report2.setTechnicianId("TECH2");
+        report2.setDescription("Deskripsi 2");
+        repository.save(report2);
 
         List<Report> allReports = repository.findAll();
 
@@ -42,10 +57,17 @@ public class InMemoryReportRepositoryTest {
 
     @Test
     public void testDeleteById() {
-        repository.save(new Report("DELID", "TECH3", "Hapus laporan", "WAITING", LocalDateTime.now()));
+        // Menggunakan setter alih-alih konstruktor
+        Report report = new Report();
+        report.setOrderId("DELID");
+        report.setTechnicianId("TECH3");
+        report.setDescription("Hapus laporan");
+        repository.save(report);
+        
         repository.deleteById("DELID");
 
-        Optional<Report> result = repository.findById("DELID");
+        // Menggunakan findByOrderId alih-alih findById
+        Optional<Report> result = repository.findByOrderId("DELID");
         assertFalse(result.isPresent());
     }
 }

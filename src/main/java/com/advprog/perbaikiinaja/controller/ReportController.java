@@ -19,12 +19,14 @@ public class ReportController {
 
     @GetMapping
     public List<Report> getAllReports() {
-        return reportService.findAllReports();
+        // Menggunakan method yang tersedia di ReportService
+        return reportService.getReports();
     }
 
     @GetMapping("/{id}")
     public Report getReportById(@PathVariable String id) {
-        Optional<Report> report = reportService.findReportById(id);
+        // Menggunakan method yang tersedia di ReportService (findByOrderId)
+        Optional<Report> report = reportService.findByOrderId(id);
         return report.orElseThrow(() -> new IllegalArgumentException("Report not found"));
     }
 }

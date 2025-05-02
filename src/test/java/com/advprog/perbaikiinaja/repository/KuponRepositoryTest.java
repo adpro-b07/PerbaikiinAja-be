@@ -1,7 +1,5 @@
 package com.advprog.perbaikiinaja.repository;
 
-public package com.advprog.perbaikiinaja.repository;
-
 import com.advprog.perbaikiinaja.model.Kupon;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,6 +54,4 @@ public class KuponRepositoryTest {
         List<Kupon> all = repository.getAllKupon();
         assertTrue(all.contains(kupon));
     }
-} {
-    
 }

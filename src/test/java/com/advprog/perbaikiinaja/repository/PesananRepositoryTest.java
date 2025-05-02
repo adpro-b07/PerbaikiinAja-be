@@ -1,5 +1,6 @@
 package com.advprog.perbaikiinaja.repository;
 
+import com.advprog.perbaikiinaja.model.PaymentMethod;
 import com.advprog.perbaikiinaja.model.Pesanan;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

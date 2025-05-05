@@ -8,8 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class PesananServiceImplTest {
@@ -21,39 +23,43 @@ public class PesananServiceImplTest {
 
     @InjectMocks private PesananServiceImpl pesananService;
 
+    private PaymentMethod paymentMethod;
+    private Pesanan pesanan;
+
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
+        paymentMethod = new PaymentMethod("Bank");
+        pesanan = new Pesanan("TV", "Rusak", null, "user@mail.com", "teknisi@mail.com", paymentMethod);
     }
 
     @Test
     public void testCreatePesananSuccess() {
         when(userService.findByEmail("pengguna@mail.com")).thenReturn(mock(User.class));
-        when(paymentMethodService.getPaymentMethodByName("Bank")).thenReturn(new PaymentMethod("1", "Bank"));
+        when(paymentMethodService.getPaymentMethodByName("Bank")).thenReturn(paymentMethod);
         when(userService.getRandomTeknisi()).thenReturn(new Admin("1", "Teknisi", "t@mail.com", "123", "0812"));
         when(pesananRepository.save(any())).thenAnswer(i -> i.getArgument(0));
-
+    
         Pesanan p = pesananService.createPesanan("TV", "Rusak", null, "pengguna@mail.com", "Bank");
-
+    
         assertEquals("TV", p.getNamaBarang());
         verify(pesananRepository).save(any());
     }
 
     @Test
     public void testSetHargaSuccess() {
-        Pesanan p = new Pesanan("TV", "Rusak", null, "u@mail.com", "t@mail.com", null);
-        when(pesananRepository.findById(1L)).thenReturn(p);
+        when(pesananRepository.findById(1L)).thenReturn(Optional.of(pesanan));
+        when(pesananRepository.save(any())).thenReturn(pesanan);
 
         pesananService.setHarga(1L, 50000);
 
-        assertEquals(50000, p.getHarga());
-        verify(pesananRepository).save(p);
+        assertEquals(50000, pesanan.getHarga());
+        verify(pesananRepository).save(pesanan);
     }
 
     @Test
     public void testUpdateStatusPesananSuccess() {
-        Pesanan pesanan = new Pesanan("TV", "Rusak", null, "user@mail.com", "teknisi@mail.com", null);
-        when(pesananRepository.findById(1L)).thenReturn(pesanan);
+        when(pesananRepository.findById(1L)).thenReturn(Optional.of(pesanan));
         when(pesananRepository.save(any())).thenReturn(pesanan);
 
         Pesanan updated = pesananService.updateStatusPesanan(1L, OrderStatus.SELESAI.getStatus());
@@ -64,8 +70,8 @@ public class PesananServiceImplTest {
     }
 
     @Test
-    public void testSetHargaWithNullPesanan() {
-        when(pesananRepository.findById(1L)).thenReturn(null);
+    public void testSetHargaNotFound() {
+        when(pesananRepository.findById(1L)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(RuntimeException.class, () -> {
             pesananService.setHarga(1L, 50000);
@@ -75,33 +81,28 @@ public class PesananServiceImplTest {
     }
 
     @Test
-    public void testAmbilPesananSuccess() {
-        Pesanan pesanan = new Pesanan("TV", "Rusak", null, "user@mail.com", "teknisi@mail.com", null);
-        when(pesananRepository.findById(1L)).thenReturn(pesanan);
+    public void testAmbilPesanan() {
+        when(pesananRepository.findById(1L)).thenReturn(Optional.of(pesanan));
         when(pesananRepository.save(any())).thenReturn(pesanan);
 
-        Pesanan result = pesananService.ambilPesanan(1L, 150000, 3);
-
-        assertNotNull(result);
-        assertEquals(150000, result.getHarga());
+        Pesanan result = pesananService.ambilPesanan(1L, 100000, 2);
+        
+        assertEquals(100000, result.getHarga());
         assertEquals(OrderStatus.WAITING_PENGGUNA.getStatus(), result.getStatusPesanan());
+        assertNotNull(result.getTanggalSelesai());
         verify(pesananRepository).save(pesanan);
     }
 
     @Test
-    public void testDeletePesananSuccess() {
-        doNothing().when(pesananRepository).deleteById(1L);
-
+    public void testDeletePesanan() {
         pesananService.deletePesanan(1L);
-
         verify(pesananRepository).deleteById(1L);
     }
 
     @Test
-    public void testFindByTeknisiSuccess() {
-        Pesanan pesanan1 = new Pesanan("TV", "Rusak", null, "user@mail.com", "teknisi@mail.com", null);
-        Pesanan pesanan2 = new Pesanan("Laptop", "Rusak", null, "user2@mail.com", "teknisi@mail.com", null);
-        when(pesananRepository.findAll()).thenReturn(List.of(pesanan1, pesanan2));
+    public void testFindByTeknisi() {
+        Pesanan pesanan2 = new Pesanan("Laptop", "Rusak", null, "user2@mail.com", "teknisi@mail.com", paymentMethod);
+        when(pesananRepository.findAll()).thenReturn(List.of(pesanan, pesanan2));
 
         List<Pesanan> result = pesananService.findByTeknisi("teknisi@mail.com");
 
@@ -112,19 +113,14 @@ public class PesananServiceImplTest {
     }
 
     @Test
-    public void testDeletePesanan() {
-        pesananService.deletePesanan(1L);
-        verify(pesananRepository).deleteById(1L);
-    }
-
-    @Test
-    public void testAmbilPesanan() {
-        Pesanan pesanan = new Pesanan("TV", "Rusak", null, "u@mail.com", "t@mail.com", null);
-        when(pesananRepository.findById(1L)).thenReturn(pesanan);
+    public void testUpdateHargaPesanan() {
+        when(pesananRepository.findById(1L)).thenReturn(Optional.of(pesanan));
+        when(kuponService.findByKodeKupon(any())).thenReturn(null);
         when(pesananRepository.save(any())).thenReturn(pesanan);
 
-        Pesanan result = pesananService.ambilPesanan(1L, 100000, 2);
+        Pesanan result = pesananService.updateHargaPesanan(1L, 100000);
+        
         assertEquals(100000, result.getHarga());
-        assertEquals(OrderStatus.WAITING_PENGGUNA.getStatus(), result.getStatusPesanan());
+        verify(pesananRepository).save(pesanan);
     }
 }

@@ -1,39 +1,13 @@
 package com.advprog.perbaikiinaja.repository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.advprog.perbaikiinaja.model.User;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.advprog.perbaikiinaja.model.User;
+import java.util.Optional;
 
 @Repository
-public class UserRepository {
-    private final Map<String, User> users = new HashMap<>();
+public interface UserRepository extends JpaRepository<User, String> {
 
-    public User save(User user) {
-        users.put(user.getId(), user);
-        return user;
-    }
-
-    public User findById(String id) {
-        return users.get(id);
-    }
-
-    public List<User> findAll() {
-        return new ArrayList<>(users.values());
-    }
-
-    public void deleteById(String id) {
-        users.remove(id);
-    }
-
-    public User findByEmailAndPassword(String email, String password) {
-        return users.values().stream()
-                .filter(user -> user.getEmail().equals(email) && user.getPassword().equals(password))
-                .findFirst()
-                .orElse(null);
-    }
+    Optional<User> findByEmailAndPassword(String email, String password);
 }

@@ -1,11 +1,24 @@
 package com.advprog.perbaikiinaja.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.Table;
+import jakarta.persistence.Inheritance;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.io.Serializable;
 
 @Getter
 @Setter
-public abstract class User {
+@Entity
+@NoArgsConstructor
+@Table(name = "users")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+public abstract class User implements Serializable {
+    @Id
     protected String id;
     protected String namaLengkap;
     protected String email;

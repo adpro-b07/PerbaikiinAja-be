@@ -1,16 +1,26 @@
 package com.advprog.perbaikiinaja.model;
 
-import lombok.Builder;
-import lombok.Getter;
+import java.io.Serializable;
 
-@Builder
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Setter
 @Getter
-public class PaymentMethod {
-    String id;
+@Entity
+@NoArgsConstructor
+public class PaymentMethod implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
     String name;
 
-    public PaymentMethod(String id, String name) {
-        this.id = id;
+    public PaymentMethod(String name) {
         this.name = name;
     }
 }

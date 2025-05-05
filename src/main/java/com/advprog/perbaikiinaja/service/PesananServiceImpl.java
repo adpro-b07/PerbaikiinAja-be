@@ -30,7 +30,8 @@ public class PesananServiceImpl implements PesananService {
 
     @Override
     public void setHarga(long idPesanan, long hargaBaru) {
-        Pesanan pesanan = pesananRepository.findById(idPesanan);
+        Pesanan pesanan = pesananRepository.findById(idPesanan)
+                .orElseThrow(() -> new RuntimeException("Pesanan tidak ditemukan dengan ID: " + idPesanan));
         if (pesanan != null) {
             pesanan.setHarga(hargaBaru);
             pesananRepository.save(pesanan);
@@ -57,7 +58,7 @@ public class PesananServiceImpl implements PesananService {
         User teknisi = userService.getRandomTeknisi();
         PaymentMethod paymentMethod = paymentMethodService.getPaymentMethodByName(metodePembayaran);
 
-        Pesanan pesanan = new Pesanan(namaBarang, kondisiBarang, kodeKupon, teknisi.getEmail(), emailPengguna, paymentMethod);
+        Pesanan pesanan = new Pesanan(namaBarang, kondisiBarang, kodeKupon, emailPengguna, teknisi.getEmail(),  paymentMethod);
         return pesananRepository.save(pesanan);
     }
 
@@ -78,7 +79,8 @@ public class PesananServiceImpl implements PesananService {
 
     @Override
     public Pesanan getPesananById(long idPesanan) {
-        Pesanan pesanan = pesananRepository.findById(idPesanan);
+        Pesanan pesanan = pesananRepository.findById(idPesanan)
+                .orElseThrow(() -> new RuntimeException("Pesanan tidak ditemukan dengan ID: " + idPesanan));
         if (pesanan == null) {
             throw new RuntimeException("Pesanan not found with ID: " + idPesanan);
         }
@@ -87,7 +89,8 @@ public class PesananServiceImpl implements PesananService {
 
     @Override
     public Pesanan updateStatusPesanan(long idPesanan, String status) {
-        Pesanan pesanan = pesananRepository.findById(idPesanan);
+        Pesanan pesanan = pesananRepository.findById(idPesanan)
+                .orElseThrow(() -> new RuntimeException("Pesanan tidak ditemukan dengan ID: " + idPesanan));
         if (pesanan == null) {
             throw new RuntimeException("Pesanan not found with ID: " + idPesanan);
         }
@@ -119,7 +122,8 @@ public class PesananServiceImpl implements PesananService {
 
     @Override
     public Pesanan findById(long id) {
-        return pesananRepository.findById(id);
+        return pesananRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pesanan tidak ditemukan dengan ID: " + id));
     }
 
     @Override
@@ -140,15 +144,23 @@ public class PesananServiceImpl implements PesananService {
 
     @Override
     public Pesanan updateHargaPesanan(long idPesanan, long newHarga) {
-        Pesanan pesanan = pesananRepository.findById(idPesanan);
+        Pesanan pesanan = pesananRepository.findById(idPesanan)
+                        .orElse(null);
         if (pesanan == null) {
             throw new RuntimeException("Pesanan not found with ID: " + idPesanan);
         }
-        Kupon kupon = kuponService.findByKodeKupon(pesanan.getKodeKupon());
+        Kupon kupon = null;
+        long hargaFinal = 0;
+        if (pesanan.getKodeKupon() != null) {
+            kupon = kuponService.findByKodeKupon(pesanan.getKodeKupon());
+        }
         if (kupon != null) {
             kuponService.decrementKuponUsage(kupon.getKodeKupon());
+            hargaFinal = newHarga - (newHarga * kupon.getPotongan() / 100);
         }
-        long hargaFinal = newHarga - (newHarga * kupon.getPotongan() / 100);
+        else {
+            hargaFinal = newHarga;
+        }
         
         pesanan.setHarga(hargaFinal);
         return pesananRepository.save(pesanan);
@@ -156,7 +168,8 @@ public class PesananServiceImpl implements PesananService {
 
     @Override
     public Pesanan ambilPesanan(long idPesanan, long estimasiHarga, int estimasiWaktu) {
-        Pesanan pesanan = pesananRepository.findById(idPesanan);
+        Pesanan pesanan = pesananRepository.findById(idPesanan)
+                .orElseThrow(() -> new RuntimeException("Pesanan tidak ditemukan dengan ID: " + idPesanan));
         pesanan.setHarga(estimasiHarga);
         pesanan.setTanggalSelesai(java.time.LocalDate.now().plusDays(estimasiWaktu).toString());
         pesanan.setStatusPesanan(OrderStatus.WAITING_PENGGUNA.getStatus());

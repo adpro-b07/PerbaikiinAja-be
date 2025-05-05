@@ -1,5 +1,6 @@
 package com.advprog.perbaikiinaja.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +20,24 @@ public class KuponServiceImpl implements KuponService {
         return kuponRepository.findAll();
     }
 
-    @Override
-    public Iterable<Kupon> getActiveKupon() {
-        return kuponRepository.getActiveKupon();
+    public List<Kupon> getActiveKupon() {
+        List<Kupon> activeKuponList = new ArrayList<>();
+        for (Kupon kupon : kuponRepository.findAll()) {
+            if (kupon.getBatasPemakaian() > 0) {
+                activeKuponList.add(kupon);
+            }
+        }
+        return activeKuponList;
     }
 
-    @Override
-    public Iterable<Kupon> getInactiveKupon() {
-        return kuponRepository.getInactiveKupon();
+    public List<Kupon> getInactiveKupon() {
+        List<Kupon> inactiveKuponList = new ArrayList<>();
+        for (Kupon kupon : kuponRepository.findAll()) {
+            if (kupon.getBatasPemakaian() <= 0) {
+                inactiveKuponList.add(kupon);
+            }
+        }
+        return inactiveKuponList;
     }
 
     @Override

@@ -5,50 +5,77 @@ import com.advprog.perbaikiinaja.model.PaymentMethod;
 import com.advprog.perbaikiinaja.model.Pesanan;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+
+import java.util.List;
+import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
+@DataJpaTest
 public class ReportRepositoryTest {
+    @Autowired
     private ReportRepository repository;
+
+    @Autowired
+    private PaymentMethodRepository paymentMethodRepository;
+
+    @Autowired
+    private PesananRepository pesananRepository;
+    
     private Report report;
     private Pesanan pesanan;
 
     @BeforeEach
     public void setup() {
-        repository = new ReportRepository();
-        pesanan = new Pesanan("AC", "Tidak dingin", null, "pengguna@mail.com", "teknisi@mail.com", new PaymentMethod("PM02", "Bank B"));
+        repository.deleteAll();
+        pesananRepository.deleteAll();
+        paymentMethodRepository.deleteAll();
+    
+        PaymentMethod method = new PaymentMethod("Bank B");
+        method = paymentMethodRepository.save(method);
+    
+        pesanan = new Pesanan("AC", "Tidak dingin", null, "pengguna@mail.com", "teknisi@mail.com", method);
+        pesanan = pesananRepository.save(pesanan);
+    
         report = new Report("Bagus", 5, pesanan);
-        repository.save(report);
+        pesanan.setReport(report);
+        report = repository.save(report);
+        pesanan = pesananRepository.save(pesanan);
     }
 
     @Test
     public void testSaveAndFindByPesananId() {
-        assertEquals(report, repository.findByPesananId(pesanan.getId()));
+        Optional<Report> found = repository.findByPesanan_Id(pesanan.getId());
+        assertTrue(found.isPresent());
+        assertEquals("Bagus", found.get().getUlasan());
+        assertEquals(5, found.get().getRating());
     }
 
     @Test
     public void testFindAll() {
-        assertTrue(repository.findAll().contains(report));
+        List<Report> reports = repository.findAll();
+        assertFalse(reports.isEmpty());
+        assertTrue(reports.stream().anyMatch(r -> r.getId().equals(report.getId())));
     }
 
     @Test
     public void testFindByTeknisi() {
-        assertTrue(repository.findByTeknisi("teknisi@mail.com").contains(report));
+        List<Report> reports = repository.findByPesanan_EmailTeknisi("teknisi@mail.com");
+        assertFalse(reports.isEmpty());
+        assertEquals("Bagus", reports.get(0).getUlasan());
     }
 
     @Test
     public void testFindByPengguna() {
-        assertTrue(repository.findByPengguna("pengguna@mail.com").contains(report));
+        List<Report> reports = repository.findByPesanan_EmailPengguna("pengguna@mail.com");
+        assertFalse(reports.isEmpty());
+        assertEquals("Bagus", reports.get(0).getUlasan());
     }
 
     @Test
-    public void testDeleteByPesananId() {
-        repository.deleteByPesananId(pesanan.getId());
-        assertNull(repository.findByPesananId(pesanan.getId()));
-    }
-
-    @Test
-    public void testDeleteAllReports() {
-        repository.deleteAllReports();
-        assertTrue(repository.findAll().isEmpty());
+    public void testCount() {
+        long count = repository.count();
+        assertEquals(1, count);
     }
 }

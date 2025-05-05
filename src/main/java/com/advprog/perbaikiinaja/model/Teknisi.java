@@ -1,10 +1,14 @@
 package com.advprog.perbaikiinaja.model;
 
+import jakarta.persistence.Entity;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
 @Getter
+@Entity
+@NoArgsConstructor
 public class Teknisi extends User {
     String alamat;
     int totalPekerjaanSelesai;

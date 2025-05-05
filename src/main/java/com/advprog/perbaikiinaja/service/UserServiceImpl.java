@@ -16,13 +16,14 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Override
-    public Iterable<User> getAllUsers() {
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
     @Override
     public User getUserByEmailAndPassword(String email, String password) {
-        return userRepository.findByEmailAndPassword(email, password);
+        return userRepository.findByEmailAndPassword(email, password)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email + " and password: " + password));
     }
 
     @Override

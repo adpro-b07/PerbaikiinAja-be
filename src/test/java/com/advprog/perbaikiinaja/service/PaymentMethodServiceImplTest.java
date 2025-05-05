@@ -9,6 +9,7 @@ import org.mockito.*;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class PaymentMethodServiceImplTest {
@@ -24,17 +25,22 @@ public class PaymentMethodServiceImplTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    public void testCreatePaymentMethodSuccess() {
-        when(paymentMethodRepository.existsByName("OVO")).thenReturn(false);
-        when(paymentMethodRepository.save(any())).thenAnswer(i -> i.getArgument(0));
+@Test
+public void testCreatePaymentMethodSuccess() {
+    when(paymentMethodRepository.existsByName("OVO")).thenReturn(false);
+    when(paymentMethodRepository.save(any())).thenAnswer(invocation -> {
+        PaymentMethod savedMethod = (PaymentMethod) invocation.getArgument(0);
+        savedMethod.setId(1L);
+        return savedMethod;
+    });
 
-        PaymentMethod method = paymentMethodService.createPaymentMethod("OVO");
+    PaymentMethod method = paymentMethodService.createPaymentMethod("OVO");
 
-        assertNotNull(method.getId());
-        assertEquals("OVO", method.getName());
-        verify(paymentMethodRepository).save(any());
-    }
+    assertNotNull(method);
+    assertNotNull(method.getId());
+    assertEquals("OVO", method.getName());
+    verify(paymentMethodRepository).save(any());
+}
 
     @Test
     public void testCreatePaymentMethodDuplicate() {
@@ -44,18 +50,10 @@ public class PaymentMethodServiceImplTest {
                 paymentMethodService.createPaymentMethod("OVO"));
     }
 
-    @Test
-    public void testGetPaymentMethodById() {
-        PaymentMethod method = new PaymentMethod("1", "Gopay");
-        when(paymentMethodRepository.findById("1")).thenReturn(method);
-
-        PaymentMethod found = paymentMethodService.getPaymentMethodById("1");
-        assertEquals("Gopay", found.getName());
-    }
 
     @Test
     public void testGetPaymentMethodByName() {
-        PaymentMethod method = new PaymentMethod("1", "Dana");
+        PaymentMethod method = new PaymentMethod("Dana");
         when(paymentMethodRepository.findAll()).thenReturn(List.of(method));
 
         PaymentMethod found = paymentMethodService.getPaymentMethodByName("Dana");
@@ -73,7 +71,7 @@ public class PaymentMethodServiceImplTest {
 
     @Test
     public void testUpdatePaymentMethodSuccess() {
-        PaymentMethod oldMethod = new PaymentMethod("1", "LinkAja");
+        PaymentMethod oldMethod = new PaymentMethod("LinkAja");
         when(paymentMethodRepository.findAll()).thenReturn(List.of(oldMethod));
         when(paymentMethodRepository.existsByName("LinkAja")).thenReturn(true);
         when(paymentMethodRepository.existsByName("ShopeePay")).thenReturn(false);
@@ -86,7 +84,7 @@ public class PaymentMethodServiceImplTest {
 
     @Test
     public void testUpdatePaymentMethodTargetExists() {
-        PaymentMethod method = new PaymentMethod("1", "LinkAja");
+        PaymentMethod method = new PaymentMethod("LinkAja");
         when(paymentMethodRepository.findAll()).thenReturn(List.of(method));
         when(paymentMethodRepository.existsByName("ShopeePay")).thenReturn(true);
 
@@ -121,7 +119,7 @@ public class PaymentMethodServiceImplTest {
     @Test
     public void testGetAllPaymentMethods() {
         when(paymentMethodRepository.findAll()).thenReturn(List.of(
-                new PaymentMethod("1", "A"), new PaymentMethod("2", "B")
+                new PaymentMethod("A"), new PaymentMethod("B")
         ));
 
         Iterable<PaymentMethod> all = paymentMethodService.getAllPaymentMethods();

@@ -7,7 +7,7 @@ public class PesananTest {
 
     @Test
     public void testConstructor() {
-        PaymentMethod method = new PaymentMethod("PM01", "Bank A");
+        PaymentMethod method = new PaymentMethod("Bank A");
         Pesanan pesanan = new Pesanan("Laptop", "Rusak total", "KUPON123", "pengguna@mail.com", "teknisi@mail.com", method);
 
         assertEquals("Laptop", pesanan.getNamaBarang());
@@ -23,7 +23,7 @@ public class PesananTest {
 
     @Test
     public void testSetters() {
-        PaymentMethod method = new PaymentMethod("PM01", "Bank A");
+        PaymentMethod method = new PaymentMethod("Bank A");
         Pesanan pesanan = new Pesanan("Laptop", "Rusak total", "KUPON123", "pengguna@mail.com", "teknisi@mail.com", method);
 
         pesanan.setHarga(300000);

@@ -1,7 +1,6 @@
 package com.advprog.perbaikiinaja.service;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,16 +19,19 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
         if (paymentMethodRepository.existsByName(name)) {
             throw new RuntimeException("Payment method with name " + name + " already exists.");
         }
-        String id = UUID.randomUUID().toString();
+        if (name == null || name.isEmpty()) {
+            throw new RuntimeException("Payment method name cannot be null or empty.");
+        }
         
-        PaymentMethod paymentMethod = new PaymentMethod(id, name);
+        PaymentMethod paymentMethod = new PaymentMethod(name);
         
         return paymentMethodRepository.save(paymentMethod);
     }
 
     @Override
-    public PaymentMethod getPaymentMethodById(String id) {
-        return paymentMethodRepository.findById(id);
+    public PaymentMethod getPaymentMethodById(Long id) {
+        return paymentMethodRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Payment method not found with ID: " + id));
     }
 
     @Override
@@ -54,7 +56,7 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
         }
 
         paymentMethodRepository.deleteByName(existingPaymentMethod.getName());
-        PaymentMethod updatedPaymentMethod = new PaymentMethod(existingPaymentMethod.getId(), newName);
+        PaymentMethod updatedPaymentMethod = new PaymentMethod(newName);
 
         return paymentMethodRepository.save(updatedPaymentMethod);
     }

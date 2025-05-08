@@ -82,7 +82,7 @@ public class PesananController {
     }
 
     @DeleteMapping("/delete/{idPesanan}")
-    public ResponseEntity<Void> deletePesanan(@PathVariable long idPesanan) {
+    public ResponseEntity<Void> deletePesanan(@PathVariable("idPesanan") long idPesanan) {
         try {
             pesananService.deletePesanan(idPesanan);
             return ResponseEntity.ok().build();
@@ -92,7 +92,7 @@ public class PesananController {
     }
 
     @PostMapping("/ambil-pesanan/{idPesanan}")
-    public ResponseEntity<Pesanan> ambilPesanan(@PathVariable long idPesanan, @RequestBody Map<String, Object> payload) {
+    public ResponseEntity<Pesanan> ambilPesanan(@PathVariable("idPesanan") long idPesanan, @RequestBody Map<String, Object> payload) {
         long estimasiHarga;
         int estimasiWaktu;
         try {

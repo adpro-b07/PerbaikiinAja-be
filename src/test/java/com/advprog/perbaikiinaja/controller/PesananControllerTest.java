@@ -139,38 +139,16 @@ public class PesananControllerTest {
 
     @Test
     public void testDeletePesanan() throws Exception {
-        mockMvc.perform(delete("/api/pesanan/1"))
+        mockMvc.perform(delete("/api/pesanan/delete/1"))
                 .andExpect(status().isOk());
 
         verify(pesananService).deletePesanan(1L);
     }
 
     @Test
-    public void testUpdateHargaPesanan() throws Exception {
-        Map<String, Long> request = new HashMap<>();
-        request.put("harga", 200000L);
-
-        Pesanan updatedPesanan = new Pesanan();
-        updatedPesanan.setId(1L);
-        updatedPesanan.setHarga(200000);
-
-        when(pesananService.updateHargaPesanan(
-                anyLong(), anyLong())
-        ).thenReturn(updatedPesanan);
-
-        mockMvc.perform(put("/api/pesanan/1/harga")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.harga").value(200000));
-
-        verify(pesananService).updateHargaPesanan(eq(1L), eq(200000L));
-    }
-
-    @Test
     public void testAmbilPesanan() throws Exception {
         Map<String, Object> request = new HashMap<>();
-        request.put("harga", 250000);
+        request.put("estimasiHarga", 250000);
         request.put("estimasiWaktu", 3);
 
         Pesanan updatedPesanan = new Pesanan();
@@ -183,7 +161,7 @@ public class PesananControllerTest {
                 anyLong(), anyLong(), anyInt())
         ).thenReturn(updatedPesanan);
 
-        mockMvc.perform(put("/api/pesanan/1/ambil")
+        mockMvc.perform(post("/api/pesanan/ambil-pesanan/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -198,7 +176,7 @@ public class PesananControllerTest {
         when(pesananService.getPesananById(99L))
                 .thenThrow(new RuntimeException("Pesanan tidak ditemukan dengan ID: 99"));
 
-        mockMvc.perform(get("/api/pesanan/99"))
+        mockMvc.perform(get("/api/pesanan/get/99"))
                 .andExpect(status().isNotFound());
     }
 }

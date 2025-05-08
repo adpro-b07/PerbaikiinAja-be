@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -77,6 +78,34 @@ public class PesananController {
             return ResponseEntity.badRequest().build();
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/delete/{idPesanan}")
+    public ResponseEntity<Void> deletePesanan(@PathVariable long idPesanan) {
+        try {
+            pesananService.deletePesanan(idPesanan);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/ambil-pesanan/{idPesanan}")
+    public ResponseEntity<Pesanan> ambilPesanan(@PathVariable long idPesanan, @RequestBody Map<String, Object> payload) {
+        long estimasiHarga;
+        int estimasiWaktu;
+        try {
+            estimasiHarga = Long.parseLong(payload.get("estimasiHarga").toString());
+            estimasiWaktu = Integer.parseInt(payload.get("estimasiWaktu").toString());
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            Pesanan pesanan = pesananService.ambilPesanan(idPesanan, estimasiHarga, estimasiWaktu);
+            return ResponseEntity.ok(pesanan);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 }

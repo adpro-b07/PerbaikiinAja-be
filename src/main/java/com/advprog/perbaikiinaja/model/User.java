@@ -37,11 +37,11 @@ public abstract class User implements Serializable {
 
     public static User createUser(String type, String id, String namaLengkap, String email, 
                                 String password, String noTelp, String alamat) {
-        if ("ADMIN".equalsIgnoreCase(type)) {
+        if ("Admin".equalsIgnoreCase(type)) {
             return new Admin(id, namaLengkap, email, password, noTelp);
-        } else if ("PENGGUNA".equalsIgnoreCase(type)) {
+        } else if ("Pengguna".equalsIgnoreCase(type)) {
             return new Pengguna(id, namaLengkap, email, password, noTelp, alamat);
-        } else if ("TEKNISI".equalsIgnoreCase(type)) {
+        } else if ("Teknisi".equalsIgnoreCase(type)) {
             return new Teknisi(id, namaLengkap, email, password, noTelp, alamat);
         }
         throw new IllegalArgumentException("Unknown user type: " + type);

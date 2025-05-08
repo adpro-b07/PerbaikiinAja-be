@@ -22,7 +22,7 @@ import jakarta.persistence.OneToOne;
 @Setter
 @Entity
 @NoArgsConstructor
-public class Pesanan implements Serializable{
+public class Pesanan implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

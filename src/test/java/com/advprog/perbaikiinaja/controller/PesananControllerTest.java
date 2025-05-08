@@ -136,4 +136,47 @@ public class PesananControllerTest {
 
         verify(pesananService).updateStatusPesanan(eq(1L), anyString());
     }
+
+    @Test
+    public void testDeletePesanan() throws Exception {
+        mockMvc.perform(delete("/api/pesanan/delete/1"))
+                .andExpect(status().isOk());
+
+        verify(pesananService).deletePesanan(1L);
+    }
+
+    @Test
+    public void testAmbilPesanan() throws Exception {
+        Map<String, Object> request = new HashMap<>();
+        request.put("estimasiHarga", 250000);
+        request.put("estimasiWaktu", 3);
+
+        Pesanan updatedPesanan = new Pesanan();
+        updatedPesanan.setId(1L);
+        updatedPesanan.setHarga(250000);
+        updatedPesanan.setStatusPesanan(OrderStatus.WAITING_PENGGUNA.getStatus());
+        updatedPesanan.setTanggalSelesai(java.time.LocalDate.now().plusDays(3).toString());
+
+        when(pesananService.ambilPesanan(
+                anyLong(), anyLong(), anyInt())
+        ).thenReturn(updatedPesanan);
+
+        mockMvc.perform(post("/api/pesanan/ambil-pesanan/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.harga").value(250000))
+                .andExpect(jsonPath("$.statusPesanan").value(OrderStatus.WAITING_PENGGUNA.getStatus()));
+
+        verify(pesananService).ambilPesanan(eq(1L), eq(250000L), eq(3));
+    }
+
+    @Test
+    public void testGetPesananByIdNotFound() throws Exception {
+        when(pesananService.getPesananById(99L))
+                .thenThrow(new RuntimeException("Pesanan tidak ditemukan dengan ID: 99"));
+
+        mockMvc.perform(get("/api/pesanan/get/99"))
+                .andExpect(status().isNotFound());
+    }
 }

@@ -21,6 +21,7 @@ import java.util.Map;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -135,5 +136,63 @@ public class PesananControllerTest {
                 .andExpect(jsonPath("$.statusPesanan").value(OrderStatus.DIKERJAKAN.getStatus()));
 
         verify(pesananService).updateStatusPesanan(eq(1L), anyString());
+    }
+
+    @Test
+    public void testDeletePesanan_Success() throws Exception {
+        mockMvc.perform(delete("/api/pesanan/delete/1"))
+                .andExpect(status().isOk());
+        verify(pesananService).deletePesanan(1L);
+    }
+
+    @Test
+    public void testDeletePesanan_NotFound() throws Exception {
+        doThrow(new RuntimeException()).when(pesananService).deletePesanan(99L);
+        mockMvc.perform(delete("/api/pesanan/delete/99"))
+                .andExpect(status().isNotFound());
+        verify(pesananService).deletePesanan(99L);
+    }
+
+    @Test
+    public void testAmbilPesanan_Success() throws Exception {
+        Map<String, Object> request = new HashMap<>();
+        request.put("estimasiHarga", 200000L);
+        request.put("estimasiWaktu", 3);
+
+        when(pesananService.ambilPesanan(1L, 200000L, 3)).thenReturn(dummyPesanan);
+
+        mockMvc.perform(post("/api/pesanan/ambil-pesanan/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.namaBarang").value("Laptop"));
+
+        verify(pesananService).ambilPesanan(1L, 200000L, 3);
+    }
+
+    @Test
+    public void testAmbilPesanan_BadRequest_InvalidNumber() throws Exception {
+        Map<String, Object> request = new HashMap<>();
+        request.put("estimasiHarga", "invalid");
+        request.put("estimasiWaktu", 3);
+
+        mockMvc.perform(post("/api/pesanan/ambil-pesanan/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testAmbilPesanan_BadRequest_RuntimeException() throws Exception {
+        Map<String, Object> request = new HashMap<>();
+        request.put("estimasiHarga", 200000L);
+        request.put("estimasiWaktu", 3);
+
+        when(pesananService.ambilPesanan(1L, 200000L, 3)).thenThrow(new RuntimeException());
+
+        mockMvc.perform(post("/api/pesanan/ambil-pesanan/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
     }
 }

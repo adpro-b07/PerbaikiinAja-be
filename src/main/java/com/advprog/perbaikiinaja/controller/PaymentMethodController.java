@@ -1,7 +1,12 @@
 package com.advprog.perbaikiinaja.controller;
 
+import com.advprog.perbaikiinaja.command.Command;
+import com.advprog.perbaikiinaja.command.CreatePaymentMethodCommand;
 import com.advprog.perbaikiinaja.model.PaymentMethod;
 import com.advprog.perbaikiinaja.service.PaymentMethodService;
+import com.advprog.perbaikiinaja.strategy.PaymentMethodSearchByName;
+import com.advprog.perbaikiinaja.strategy.SearchStrategy;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,16 +34,17 @@ public class PaymentMethodController {
     @PostMapping("/create")
     public ResponseEntity<PaymentMethod> createPaymentMethod(
             @RequestBody Map<String, String> payload) {
-        
+
         String name = payload.get("name");
-        
+
         if (name == null || name.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        
+
         try {
-            PaymentMethod paymentMethod = paymentMethodService.createPaymentMethod(name);
-            return ResponseEntity.status(HttpStatus.CREATED).body(paymentMethod);
+            Command<PaymentMethod> command = new CreatePaymentMethodCommand(paymentMethodService, name);
+            PaymentMethod result = command.execute();
+            return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -47,8 +53,9 @@ public class PaymentMethodController {
     @GetMapping("/get/{name}")
     public ResponseEntity<PaymentMethod> getPaymentMethodByName(@PathVariable("name") String name) {
         try {
-            PaymentMethod paymentMethod = paymentMethodService.getPaymentMethodByName(name);
-            return new ResponseEntity<>(paymentMethod, HttpStatus.OK);
+            SearchStrategy<PaymentMethod> strategy = new PaymentMethodSearchByName(paymentMethodService, name);
+            PaymentMethod result = strategy.search();
+            return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

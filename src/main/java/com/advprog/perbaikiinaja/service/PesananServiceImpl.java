@@ -13,6 +13,10 @@ import com.advprog.perbaikiinaja.model.Pesanan;
 import com.advprog.perbaikiinaja.model.User;
 import com.advprog.perbaikiinaja.repository.PesananRepository;
 
+import com.advprog.perbaikiinaja.observer.PesananObserver;
+import com.advprog.perbaikiinaja.observer.UserNotifier;
+import com.advprog.perbaikiinaja.observer.PesananPublisher;
+
 @Service
 public class PesananServiceImpl implements PesananService {
 
@@ -95,7 +99,13 @@ public class PesananServiceImpl implements PesananService {
             throw new RuntimeException("Pesanan not found with ID: " + idPesanan);
         }
         pesanan.setStatusPesanan(status);
-        return pesananRepository.save(pesanan);
+        
+        Pesanan updated = pesananRepository.save(pesanan);
+
+        // Notify observers
+        notifyPesananObservers(updated);
+
+        return updated;
     }
 
     @Override
@@ -173,6 +183,18 @@ public class PesananServiceImpl implements PesananService {
         pesanan.setHarga(estimasiHarga);
         pesanan.setTanggalSelesai(java.time.LocalDate.now().plusDays(estimasiWaktu).toString());
         pesanan.setStatusPesanan(OrderStatus.WAITING_PENGGUNA.getStatus());
-        return pesananRepository.save(pesanan);
+
+        Pesanan updated = pesananRepository.save(pesanan);
+
+        // Notify observers
+        notifyPesananObservers(updated);
+
+        return updated;
+    }
+
+    private void notifyPesananObservers(Pesanan pesanan) {
+        PesananPublisher publisher = new PesananPublisher();
+        publisher.addObserver(new UserNotifier());
+        publisher.notifyAllObservers(pesanan);
     }
 }

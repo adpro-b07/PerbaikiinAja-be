@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.advprog.perbaikiinaja.command.AmbilPesananCommand;
 import com.advprog.perbaikiinaja.enums.OrderStatus;
 import com.advprog.perbaikiinaja.model.Pesanan;
 import com.advprog.perbaikiinaja.service.PesananService;
@@ -102,8 +103,9 @@ public class PesananController {
             return ResponseEntity.badRequest().build();
         }
         try {
-            Pesanan pesanan = pesananService.ambilPesanan(idPesanan, estimasiHarga, estimasiWaktu);
-            return ResponseEntity.ok(pesanan);
+            AmbilPesananCommand command = new AmbilPesananCommand(pesananService, idPesanan, estimasiHarga, estimasiWaktu);
+            Pesanan updatedPesanan = command.execute();
+            return ResponseEntity.ok(updatedPesanan);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
         }

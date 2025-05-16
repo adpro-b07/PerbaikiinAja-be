@@ -34,6 +34,22 @@ Future component diagram memberikan solusi dengan menambahkan komponen-komponen 
 
 Integrasi dengan Payment Gateway System juga menjadi aspek penting dalam arsitektur baru. Dalam sistem sebelumnya, metode pembayaran belum terintegrasi secara eksplisit, sehingga menimbulkan risiko kegagalan konfirmasi dan ketidakteraturan dalam pencatatan transaksi. Dengan modul pembayaran yang berdiri sendiri, sistem akan lebih tangguh terhadap kesalahan proses serta memudahkan audit dan pelacakan pembayaran.
 
+# Individual
+
+## Melakukan Pemesanan Jasa Perbaikan Barang
+
+Nama: Andreas Timothy
+
+NPM: 2306259963
+
+### Component Diagram
+
+![Component diagram](./images/pesanan/component-diagram.png)
+
+### Code Diagram
+
+![Code diagram](./images/pesanan/code-diagram.png)
+
 ## Payment Method
 
 ### Component Diagram

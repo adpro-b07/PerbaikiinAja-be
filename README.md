@@ -43,3 +43,13 @@ Integrasi dengan Payment Gateway System juga menjadi aspek penting dalam arsitek
 ### Code Diagram
 
 ![Image](https://github.com/user-attachments/assets/a1efccb9-eae7-45e3-87a5-220b4ab35d8c)
+
+### Melihat Laporan & Mengelola Kupon
+
+#### component diagram
+
+![zufar component](/images/zufarcomponent.drawio.png)
+
+#### code diagram
+
+![zufar code](/images/ZufarCode.drawio.png)

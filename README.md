@@ -8,7 +8,7 @@
 
 ### Container Diagram
 
-![Container diagram](./images/container-diagram.png)
+![Container diagram](./images/container-diagram.jpg)
 
 ### Deployment Diagram
 

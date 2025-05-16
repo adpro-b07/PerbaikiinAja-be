@@ -33,3 +33,13 @@ Dari context diagram saat ini, terlihat bahwa semua proses utama, baik autentika
 Future component diagram memberikan solusi dengan menambahkan komponen-komponen pendukung seperti Authentication System, Notification System, Payment Gateway System, dan Analytics & Reporting System yang meskipun tidak sepenuhnya menghapus sistem monolitik, berfungsi untuk melepaskan tanggung jawab-tanggung jawab tertentu dari inti sistem utama. Dengan sistem autentikasi yang berdiri sendiri, keamanan akses pengguna dapat dikontrol lebih ketat dan dapat diskalakan sesuai kebutuhan tanpa harus mengganggu layanan utama. Begitu pula dengan sistem notifikasi yang menangani pengiriman pesan secara otomatis dan terjadwal kepada user maupun teknisi, yang sebelumnya ditangani oleh sistem utama secara langsung.
 
 Integrasi dengan Payment Gateway System juga menjadi aspek penting dalam arsitektur baru. Dalam sistem sebelumnya, metode pembayaran belum terintegrasi secara eksplisit, sehingga menimbulkan risiko kegagalan konfirmasi dan ketidakteraturan dalam pencatatan transaksi. Dengan modul pembayaran yang berdiri sendiri, sistem akan lebih tangguh terhadap kesalahan proses serta memudahkan audit dan pelacakan pembayaran.
+
+## Payment Method
+
+### Component Diagram
+
+![Image](https://github.com/user-attachments/assets/d3cba548-451e-4ddd-b221-b020d4866c8b)
+
+### Code Diagram
+
+![Image](https://github.com/user-attachments/assets/a1efccb9-eae7-45e3-87a5-220b4ab35d8c)

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.advprog.perbaikiinaja.model.PaymentMethod;
 import com.advprog.perbaikiinaja.repository.PaymentMethodRepository;
@@ -55,13 +56,13 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
             throw new RuntimeException("Payment method with Name " + newName + " already exists.");
         }
 
-        paymentMethodRepository.deleteByName(existingPaymentMethod.getName());
-        PaymentMethod updatedPaymentMethod = new PaymentMethod(newName);
+        existingPaymentMethod.setName(newName);
 
-        return paymentMethodRepository.save(updatedPaymentMethod);
+        return paymentMethodRepository.save(existingPaymentMethod);
     }
 
     @Override
+    @Transactional
     public void deletePaymentMethod(String name) {
         if (!paymentMethodRepository.existsByName(name)) {
             throw new RuntimeException("Payment method not found with Name: " + name);

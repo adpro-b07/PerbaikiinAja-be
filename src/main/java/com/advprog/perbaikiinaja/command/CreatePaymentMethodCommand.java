@@ -17,4 +17,4 @@ public class CreatePaymentMethodCommand implements Command<PaymentMethod> {
     public PaymentMethod execute() {
         return paymentMethodService.createPaymentMethod(name);
     }
-}
+}   

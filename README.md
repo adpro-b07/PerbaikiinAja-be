@@ -52,6 +52,10 @@ NPM: 2306259963
 
 ## Payment Method
 
+Nama: Muhammad Firaz Al Aqib
+
+NPM: 2306217481
+
 ### Component Diagram
 
 ![Image](https://github.com/user-attachments/assets/d3cba548-451e-4ddd-b221-b020d4866c8b)

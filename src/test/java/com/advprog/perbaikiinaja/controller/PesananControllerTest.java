@@ -179,4 +179,24 @@ public class PesananControllerTest {
         mockMvc.perform(get("/api/pesanan/get/99"))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    public void testGetPesananByTeknisi() throws Exception {
+        Pesanan pesanan2 = new Pesanan();
+        pesanan2.setId(2L);
+        pesanan2.setNamaBarang("Printer");
+        pesanan2.setKondisiBarang("Tinta bocor");
+
+        List<Pesanan> pesananList = Arrays.asList(dummyPesanan, pesanan2);
+
+        when(pesananService.findByTeknisi("teknisi@example.com")).thenReturn(pesananList);
+
+        mockMvc.perform(get("/api/pesanan/teknisi/teknisi@example.com"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].namaBarang").value("Laptop"))
+                .andExpect(jsonPath("$[1].namaBarang").value("Printer"));
+
+        verify(pesananService).findByTeknisi("teknisi@example.com");
+    }
 }

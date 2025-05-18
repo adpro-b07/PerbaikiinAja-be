@@ -1,5 +1,6 @@
 package com.advprog.perbaikiinaja.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,17 @@ public class PesananController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/teknisi/{email}")
+    public ResponseEntity<List<Pesanan>> getPesananByTeknisi(@PathVariable("email") String email) {
+        try {
+            List<Pesanan> pesanan = pesananService.findByTeknisi(email);
+            return ResponseEntity.ok(pesanan);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
 
     @PostMapping("/create")
     public ResponseEntity<Pesanan> createPesanan(@RequestBody Map<String, String> payload) {

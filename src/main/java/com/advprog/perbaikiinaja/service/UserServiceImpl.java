@@ -6,7 +6,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.advprog.perbaikiinaja.model.Pesanan;
 import com.advprog.perbaikiinaja.model.User;
+import com.advprog.perbaikiinaja.repository.PesananRepository;
 import com.advprog.perbaikiinaja.repository.UserRepository;
 
 @Service
@@ -14,6 +16,9 @@ public class UserServiceImpl implements UserService {
     
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PesananRepository pesananRepository;
 
     @Override
     public List<User> getAllUsers() {
@@ -50,5 +55,16 @@ public class UserServiceImpl implements UserService {
         }
         int randomIndex = (int) (Math.random() * teknisiList.size());
         return teknisiList.get(randomIndex);
+    }
+
+    @Override
+    public Integer getJumlahPesanan(User loggedUser) {
+        Integer jumlahPesanan = 0;
+        for (Pesanan pesanan : pesananRepository.findAll()) {
+            if (pesanan.getEmailPengguna().equals(loggedUser.getEmail())) {
+                jumlahPesanan++;
+            }
+        }
+        return jumlahPesanan;
     }
 }

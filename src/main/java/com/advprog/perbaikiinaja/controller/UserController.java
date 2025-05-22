@@ -107,4 +107,14 @@ public class UserController {
         }
         return ResponseEntity.ok(loggedUser);
     }
+
+    @GetMapping("/jumlah-pesanan")
+    public ResponseEntity<Integer> getJumlahPesanan(HttpSession session) {
+        User loggedUser = (User) session.getAttribute("loggedUser");
+        if (loggedUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        int jumlahPesanan = userService.getJumlahPesanan(loggedUser);
+        return ResponseEntity.ok(jumlahPesanan);
+    }
 }

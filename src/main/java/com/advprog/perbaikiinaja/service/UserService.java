@@ -9,4 +9,5 @@ public interface UserService {
     User getUserByEmailAndPassword(String email, String password);
     User findByEmail(String email);
     User getRandomTeknisi();
+    Integer getJumlahPesanan(User loggedUser);
 }

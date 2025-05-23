@@ -46,6 +46,11 @@ public class Pesanan implements Serializable {
     @JsonIgnore
     Report report;
 
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
+    @JoinColumn(name = "laporan_teknisi_id")
+    @JsonIgnore
+    LaporanTeknisi laporanTeknisi;
+
     public Pesanan(String namaBarang, String kondisiBarang, String kodeKupon, String emailPengguna, String emailTeknisi, PaymentMethod metodePembayaran) {
         this.namaBarang = namaBarang;
         this.kondisiBarang = kondisiBarang;

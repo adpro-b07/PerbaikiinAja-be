@@ -11,6 +11,7 @@ public interface PesananService {
     Pesanan createPesanan(Pesanan pesanan);
     Iterable<Pesanan> getAllPesanan();
     Pesanan getPesananById(long idPesanan);
+    List<Pesanan> findByPengguna(String emailPengguna);
     Pesanan updateStatusPesanan(long idPesanan, String statusPesanan);
     List<Pesanan> findByTeknisi(String emailTeknisi);
     List<Pesanan> findByTeknisiMenungguTeknisi(String emailTeknisi);

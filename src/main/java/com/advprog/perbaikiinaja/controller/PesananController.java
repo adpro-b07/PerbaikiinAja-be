@@ -47,6 +47,16 @@ public class PesananController {
         }
     }
 
+    @GetMapping("/pengguna/{email}")
+    public ResponseEntity<List<Pesanan>> getPesananByPengguna(@PathVariable("email") String email) {
+        try {
+            List<Pesanan> pesanan = pesananService.findByPengguna(email);
+            return ResponseEntity.ok(pesanan);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
     @GetMapping("/teknisi/{email}")
     public ResponseEntity<List<Pesanan>> getPesananByTeknisi(@PathVariable("email") String email) {
         try {

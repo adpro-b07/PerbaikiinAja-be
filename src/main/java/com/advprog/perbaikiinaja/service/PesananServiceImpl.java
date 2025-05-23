@@ -92,6 +92,17 @@ public class PesananServiceImpl implements PesananService {
     }
 
     @Override
+    public List<Pesanan> findByPengguna(String emailPengguna) {
+        List<Pesanan> pesananList = new ArrayList<>();
+        for (Pesanan pesanan : pesananRepository.findAll()) {
+            if (pesanan.getEmailPengguna().equals(emailPengguna)) {
+                pesananList.add(pesanan);
+            }
+        }
+        return pesananList;
+    }
+
+    @Override
     public Pesanan updateStatusPesanan(long idPesanan, String status) {
         Pesanan pesanan = pesananRepository.findById(idPesanan)
                 .orElseThrow(() -> new RuntimeException("Pesanan tidak ditemukan dengan ID: " + idPesanan));

@@ -1,34 +1,29 @@
 package com.advprog.perbaikiinaja.model;
 
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LaporanTeknisiTest {
 
     @Test
-    public void testLaporanTeknisiConstructorAndGetterSetter() {
-        Pesanan pesanan = new Pesanan();
-        pesanan.setId(123L);
-
-        LaporanTeknisi laporan = new LaporanTeknisi();
-        laporan.setId("abc-123");
-        laporan.setDeskripsi("Ganti layar");
-        laporan.setPesanan(pesanan);
-
-        assertEquals("abc-123", laporan.getId());
-        assertEquals("Ganti layar", laporan.getDeskripsi());
-        assertEquals(123L, laporan.getPesanan().getId());
+    public void testConstructor() {
+        PaymentMethod method = new PaymentMethod("Bank A");
+        Pesanan pesanan = new Pesanan("Kulkas", "Tidak dingin", null, "u@mail.com", "t@mail.com", method);
+        LaporanTeknisi laporanTeknisi = new LaporanTeknisi("Ganti kompresor", pesanan);        
+        
+        assertEquals("Ganti kompresor", laporanTeknisi.getLaporan());
+        assertEquals(pesanan, laporanTeknisi.getPesanan());
     }
 
     @Test
-    public void testLaporanTeknisiAllArgsConstructor() {
-        Pesanan pesanan = new Pesanan();
-        pesanan.setId(999L);
-
-        LaporanTeknisi laporan = new LaporanTeknisi("Perbaiki keyboard", pesanan);
-
-        assertEquals("Perbaiki keyboard", laporan.getDeskripsi());
-        assertEquals(999L, laporan.getPesanan().getId());
+    public void testSetters() {
+        PaymentMethod method = new PaymentMethod("Bank A");
+        Pesanan pesanan = new Pesanan("Kulkas", "Tidak dingin", null, "u@mail.com", "t@mail.com", method);
+        LaporanTeknisi laporanTeknisi = new LaporanTeknisi("Ganti kompresor", pesanan);    
+        
+        laporanTeknisi.setLaporan("Ganti filter");
+        
+        assertEquals("Ganti filter", laporanTeknisi.getLaporan());
+        assertEquals(pesanan, laporanTeknisi.getPesanan());
     }
 }

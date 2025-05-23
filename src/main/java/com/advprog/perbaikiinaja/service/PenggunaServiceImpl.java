@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.advprog.perbaikiinaja.enums.OrderStatus;
 import com.advprog.perbaikiinaja.model.Pesanan;
 import com.advprog.perbaikiinaja.model.User;
+import com.advprog.perbaikiinaja.observer.PesananPublisher;
 import com.advprog.perbaikiinaja.repository.UserRepository;
 
 @Service
@@ -19,6 +20,9 @@ public class PenggunaServiceImpl implements PenggunaService {
 
     @Autowired
     private PesananService pesananService;
+
+    @Autowired
+    private PesananPublisher pesananPublisher;
 
     @Override
     public User createPengguna(String namaLengkap, String email, String password, String noTelp, String alamat) {
@@ -34,7 +38,7 @@ public class PenggunaServiceImpl implements PenggunaService {
     @Override
     public void terimaPesanan(long idPesanan) {
         Pesanan pesanan = pesananService.findById(idPesanan);
-        pesanan.setStatusPesanan(OrderStatus.DIKERJAKAN.getStatus());
+        pesananPublisher.updateStatus(pesanan, OrderStatus.DIKERJAKAN.getStatus());
         pesananService.createPesanan(pesanan);
     }
 

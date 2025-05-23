@@ -11,6 +11,7 @@ import com.advprog.perbaikiinaja.model.Pesanan;
 import com.advprog.perbaikiinaja.model.Report;
 import com.advprog.perbaikiinaja.model.Teknisi;
 import com.advprog.perbaikiinaja.model.User;
+import com.advprog.perbaikiinaja.observer.PesananPublisher;
 import com.advprog.perbaikiinaja.repository.UserRepository;
 
 @Service
@@ -44,18 +45,27 @@ public class TeknisiServiceImpl implements TeknisiService {
         return pesananService.findByTeknisiMenungguTeknisi(emailTeknisi);
     }
 
+    @Autowired
+    private PesananPublisher pesananPublisher;
+
     @Override
     public void selesaikanPesanan(long idPesanan) {
         Pesanan pesanan = pesananService.findById(idPesanan);
-        pesanan.setStatusPesanan(OrderStatus.SELESAI.getStatus());
-        User user = userService.findByEmail(pesanan.getEmailTeknisi());
-        if (user instanceof Teknisi) {
-            Teknisi teknisi = (Teknisi) user;
-            teknisi.setTotalPekerjaanSelesai(teknisi.getTotalPekerjaanSelesai() + 1);
-            teknisi.setTotalPenghasilan(teknisi.getTotalPenghasilan() + pesanan.getHarga());
-        } else {
-            throw new RuntimeException("User dengan email " + pesanan.getEmailTeknisi() + " bukan seorang Teknisi");
+        String emailTeknisi = pesanan.getEmailTeknisi();
+        
+        User user = userService.findByEmail(emailTeknisi);
+        
+        if (!(user instanceof Teknisi)) {
+            throw new RuntimeException("User dengan email " + emailTeknisi + " bukan seorang Teknisi");
         }
+        
+        Teknisi teknisi = (Teknisi) user;
+        teknisi.setTotalPekerjaanSelesai(teknisi.getTotalPekerjaanSelesai() + 1);
+        teknisi.setTotalPenghasilan(teknisi.getTotalPenghasilan() + pesanan.getHarga());
+        
+        // Use the publisher to update status instead of directly setting it
+        pesananPublisher.updateStatus(pesanan, OrderStatus.SELESAI.getStatus());
+        userRepository.save(teknisi);
     }
 
     @Override

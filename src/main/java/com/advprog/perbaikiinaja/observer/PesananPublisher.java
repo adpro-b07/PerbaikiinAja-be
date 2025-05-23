@@ -16,4 +16,10 @@ public class PesananPublisher {
             observer.update(pesanan);
         }
     }
+    
+    public void updateStatus(Pesanan pesanan, String newStatus) {
+        // Update the status
+        pesanan.setStatusPesanan(newStatus);
+        notifyAllObservers(pesanan);
+    }
 }

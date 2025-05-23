@@ -32,6 +32,9 @@ public class PesananServiceImpl implements PesananService {
     @Autowired
     private KuponService kuponService;
 
+    @Autowired
+    private PesananPublisher pesananPublisher;
+
     @Override
     public void setHarga(long idPesanan, long hargaBaru) {
         Pesanan pesanan = pesananRepository.findById(idPesanan)
@@ -98,14 +101,11 @@ public class PesananServiceImpl implements PesananService {
         if (pesanan == null) {
             throw new RuntimeException("Pesanan not found with ID: " + idPesanan);
         }
-        pesanan.setStatusPesanan(status);
         
-        Pesanan updated = pesananRepository.save(pesanan);
+        pesananPublisher.updateStatus(pesanan, status);
+        pesananRepository.save(pesanan);
 
-        // Notify observers
-        notifyPesananObservers(updated);
-
-        return updated;
+        return pesanan;
     }
 
     @Override
@@ -176,25 +176,16 @@ public class PesananServiceImpl implements PesananService {
         return pesananRepository.save(pesanan);
     }
 
-    @Override
+   @Override
     public Pesanan ambilPesanan(long idPesanan, long estimasiHarga, int estimasiWaktu) {
         Pesanan pesanan = pesananRepository.findById(idPesanan)
                 .orElseThrow(() -> new RuntimeException("Pesanan tidak ditemukan dengan ID: " + idPesanan));
+        
         pesanan.setHarga(estimasiHarga);
         pesanan.setTanggalSelesai(java.time.LocalDate.now().plusDays(estimasiWaktu).toString());
-        pesanan.setStatusPesanan(OrderStatus.WAITING_PENGGUNA.getStatus());
-
-        Pesanan updated = pesananRepository.save(pesanan);
-
-        // Notify observers
-        notifyPesananObservers(updated);
-
-        return updated;
-    }
-
-    private void notifyPesananObservers(Pesanan pesanan) {
-        PesananPublisher publisher = new PesananPublisher();
-        publisher.addObserver(new UserNotifier());
-        publisher.notifyAllObservers(pesanan);
+        String updatedStatus = OrderStatus.WAITING_PENGGUNA.getStatus();
+        pesananPublisher.updateStatus(pesanan, updatedStatus);
+        
+        return pesananRepository.save(pesanan);
     }
 }

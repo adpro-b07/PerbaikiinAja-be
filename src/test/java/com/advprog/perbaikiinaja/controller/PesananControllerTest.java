@@ -116,6 +116,22 @@ public class PesananControllerTest {
     }
 
     @Test
+    void testGetPesananByPengguna() throws Exception {
+        Pesanan pesanan1 = new Pesanan();
+        pesanan1.setEmailPengguna("user@email.com");
+        Pesanan pesanan2 = new Pesanan();
+        pesanan2.setEmailPengguna("user@email.com");
+
+        when(pesananService.findByPengguna("user@email.com"))
+            .thenReturn(Arrays.asList(pesanan1, pesanan2));
+
+        mockMvc.perform(get("/api/pesanan/pengguna/user@email.com")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].emailPengguna").value("user@email.com"));
+    }
+
+    @Test
     public void testUpdateStatusPesanan() throws Exception {
         Map<String, String> request = new HashMap<>();
         request.put("status", OrderStatus.DIKERJAKAN.name());

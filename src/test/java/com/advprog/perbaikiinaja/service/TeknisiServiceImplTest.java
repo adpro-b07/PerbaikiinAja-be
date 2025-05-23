@@ -6,6 +6,7 @@ import com.advprog.perbaikiinaja.model.Pesanan;
 import com.advprog.perbaikiinaja.model.Report;
 import com.advprog.perbaikiinaja.model.Teknisi;
 import com.advprog.perbaikiinaja.model.User;
+import com.advprog.perbaikiinaja.observer.PesananPublisher;
 import com.advprog.perbaikiinaja.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class TeknisiServiceImplTest {
@@ -36,6 +38,9 @@ class TeknisiServiceImplTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private PesananPublisher pesananPublisher;
 
     @BeforeEach
     void setUp() {
@@ -99,8 +104,7 @@ class TeknisiServiceImplTest {
 
         assertEquals(2, teknisi.getTotalPekerjaanSelesai());
         assertEquals(300, teknisi.getTotalPenghasilan());
-        verify(pesanan).setStatusPesanan(OrderStatus.SELESAI.getStatus());
-    }
+        verify(pesananPublisher).updateStatus(pesanan, OrderStatus.SELESAI.getStatus());    }
 
     @Test
     void testSelesaikanPesananNotTeknisiShouldThrow() {

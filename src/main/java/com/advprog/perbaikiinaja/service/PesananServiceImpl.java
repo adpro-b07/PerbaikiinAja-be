@@ -13,8 +13,6 @@ import com.advprog.perbaikiinaja.model.Pesanan;
 import com.advprog.perbaikiinaja.model.User;
 import com.advprog.perbaikiinaja.repository.PesananRepository;
 
-import com.advprog.perbaikiinaja.observer.PesananObserver;
-import com.advprog.perbaikiinaja.observer.UserNotifier;
 import com.advprog.perbaikiinaja.observer.PesananPublisher;
 
 @Service

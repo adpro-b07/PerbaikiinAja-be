@@ -3,6 +3,7 @@ package com.advprog.perbaikiinaja;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import com.advprog.perbaikiinaja.model.Admin;
 import com.advprog.perbaikiinaja.model.User;
@@ -12,6 +13,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 
 @SpringBootApplication
+@EnableAsync
 public class PerbaikiinAjaApplication {
     @Autowired
     private UserRepository userRepository;

@@ -2,6 +2,7 @@ package com.advprog.perbaikiinaja.service;
 
 import com.advprog.perbaikiinaja.enums.OrderStatus;
 import com.advprog.perbaikiinaja.model.*;
+import com.advprog.perbaikiinaja.observer.PesananPublisher;
 import com.advprog.perbaikiinaja.repository.PesananRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 public class PesananServiceImplTest {
@@ -20,6 +23,7 @@ public class PesananServiceImplTest {
     @Mock private UserService userService;
     @Mock private PaymentMethodService paymentMethodService;
     @Mock private KuponService kuponService;
+    @Mock private PesananPublisher pesananPublisher; // Add this mock
 
     @InjectMocks private PesananServiceImpl pesananService;
 
@@ -61,12 +65,15 @@ public class PesananServiceImplTest {
     public void testUpdateStatusPesananSuccess() {
         when(pesananRepository.findById(1L)).thenReturn(Optional.of(pesanan));
         when(pesananRepository.save(any())).thenReturn(pesanan);
+        
+        doNothing().when(pesananPublisher).updateStatus(any(Pesanan.class), anyString());
 
         Pesanan updated = pesananService.updateStatusPesanan(1L, OrderStatus.SELESAI.getStatus());
 
         assertNotNull(updated);
-        assertEquals(OrderStatus.SELESAI.getStatus(), updated.getStatusPesanan());
+        assertEquals(OrderStatus.WAITING_TEKNISI.getStatus(), updated.getStatusPesanan());
         verify(pesananRepository).save(pesanan);
+        verify(pesananPublisher).updateStatus(eq(pesanan), eq(OrderStatus.SELESAI.getStatus()));
     }
 
     @Test
@@ -88,8 +95,8 @@ public class PesananServiceImplTest {
         Pesanan result = pesananService.ambilPesanan(1L, 100000, 2);
         
         assertEquals(100000, result.getHarga());
-        assertEquals(OrderStatus.WAITING_PENGGUNA.getStatus(), result.getStatusPesanan());
         assertNotNull(result.getTanggalSelesai());
+        verify(pesananPublisher).updateStatus(pesanan, OrderStatus.WAITING_PENGGUNA.getStatus());    
         verify(pesananRepository).save(pesanan);
     }
 

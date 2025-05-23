@@ -13,7 +13,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 
 @SpringBootApplication
-@EnableAsync
+@EnableAsync(proxyTargetClass = true)
 public class PerbaikiinAjaApplication {
     @Autowired
     private UserRepository userRepository;

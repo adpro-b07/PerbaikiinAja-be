@@ -5,7 +5,6 @@ import org.springframework.scheduling.annotation.Async;
 
 import com.advprog.perbaikiinaja.event.PesananStatusChangedEvent;
 import com.advprog.perbaikiinaja.model.Pesanan;
-
 public class UserNotifier implements PesananObserver {
     @Override
     public void update(Pesanan pesanan) {
@@ -15,7 +14,7 @@ public class UserNotifier implements PesananObserver {
     @Async
     @EventListener
     public void handleStatusChanged(PesananStatusChangedEvent event) {
-        var pesanan = event.getPesanan();
+        Pesanan pesanan = event.getPesanan();
         System.out.println("📢 [NOTIF via EDA] Pesanan ID " + pesanan.getId() + 
             " status: " + pesanan.getStatusPesanan());
     }

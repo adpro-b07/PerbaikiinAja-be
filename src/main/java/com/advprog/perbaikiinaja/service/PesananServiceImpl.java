@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import com.advprog.perbaikiinaja.enums.OrderStatus;
+import com.advprog.perbaikiinaja.event.PesananStatusChangedEvent;
 import com.advprog.perbaikiinaja.model.Kupon;
 import com.advprog.perbaikiinaja.model.PaymentMethod;
 import com.advprog.perbaikiinaja.model.Pesanan;
@@ -32,6 +34,9 @@ public class PesananServiceImpl implements PesananService {
 
     @Autowired
     private PesananPublisher pesananPublisher;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     @Override
     public void setHarga(long idPesanan, long hargaBaru) {
@@ -92,7 +97,7 @@ public class PesananServiceImpl implements PesananService {
         return pesanan;
     }
 
-    @Override
+   @Override
     public Pesanan updateStatusPesanan(long idPesanan, String status) {
         Pesanan pesanan = pesananRepository.findById(idPesanan)
                 .orElseThrow(() -> new RuntimeException("Pesanan tidak ditemukan dengan ID: " + idPesanan));
@@ -101,9 +106,12 @@ public class PesananServiceImpl implements PesananService {
         }
         
         pesananPublisher.updateStatus(pesanan, status);
-        pesananRepository.save(pesanan);
-
-        return pesanan;
+        Pesanan updated = pesananRepository.save(pesanan);
+        
+        // Publish event after status update
+        eventPublisher.publishEvent(new PesananStatusChangedEvent(updated));
+        
+        return updated;
     }
 
     @Override
@@ -174,16 +182,23 @@ public class PesananServiceImpl implements PesananService {
         return pesananRepository.save(pesanan);
     }
 
-   @Override
+    @Override
     public Pesanan ambilPesanan(long idPesanan, long estimasiHarga, int estimasiWaktu) {
         Pesanan pesanan = pesananRepository.findById(idPesanan)
                 .orElseThrow(() -> new RuntimeException("Pesanan tidak ditemukan dengan ID: " + idPesanan));
         
         pesanan.setHarga(estimasiHarga);
         pesanan.setTanggalSelesai(java.time.LocalDate.now().plusDays(estimasiWaktu).toString());
-        String updatedStatus = OrderStatus.WAITING_PENGGUNA.getStatus();
-        pesananPublisher.updateStatus(pesanan, updatedStatus);
         
-        return pesananRepository.save(pesanan);
+        // Use the publisher instead of direct setting
+        pesananPublisher.updateStatus(pesanan, OrderStatus.WAITING_PENGGUNA.getStatus());
+        
+        Pesanan updated = pesananRepository.save(pesanan);
+
+        // 🚀 Trigger event
+        eventPublisher.publishEvent(new PesananStatusChangedEvent(updated));
+
+        return updated;
     }
+
 }

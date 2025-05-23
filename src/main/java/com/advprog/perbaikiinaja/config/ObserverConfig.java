@@ -19,6 +19,6 @@ public class ObserverConfig {
     
     @Bean
     public PesananObserver userNotifier() {
-        return new UserNotifier();
+        return new UserNotifier(null);
     }
 }

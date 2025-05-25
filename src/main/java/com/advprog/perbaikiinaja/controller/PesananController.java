@@ -16,9 +16,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.advprog.perbaikiinaja.command.AmbilPesananCommand;
+import com.advprog.perbaikiinaja.dto.AmbilPesananRequestDTO;
+import com.advprog.perbaikiinaja.dto.CreatePesananRequestDTO;
+import com.advprog.perbaikiinaja.dto.UpdateStatusRequestDTO;
 import com.advprog.perbaikiinaja.enums.OrderStatus;
 import com.advprog.perbaikiinaja.model.Pesanan;
 import com.advprog.perbaikiinaja.service.PesananService;
+
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("api/pesanan")
@@ -69,18 +74,14 @@ public class PesananController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<Pesanan> createPesanan(@RequestBody Map<String, String> payload) {
-        String namaBarang = payload.get("namaBarang");
-        String kondisiBarang = payload.get("kondisiBarang");
-        String kodeKupon = payload.get("kodeKupon");
-        String emailPengguna = payload.get("emailPengguna");
-        String metodePembayaran = payload.get("metodePembayaran");
-
-        if (namaBarang == null || kondisiBarang == null || emailPengguna == null || metodePembayaran == null) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Pesanan> createPesanan(@Valid @RequestBody CreatePesananRequestDTO requestDTO) {
         try {
-            Pesanan pesanan = pesananService.createPesanan(namaBarang, kondisiBarang, kodeKupon, emailPengguna, metodePembayaran);
+            Pesanan pesanan = pesananService.createPesanan(
+                requestDTO.getNamaBarang(), 
+                requestDTO.getKondisiBarang(), 
+                requestDTO.getKodeKupon(), 
+                requestDTO.getEmailPengguna(), 
+                requestDTO.getMetodePembayaran());
             return new ResponseEntity<>(pesanan, HttpStatus.CREATED);  
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -88,13 +89,11 @@ public class PesananController {
     }
 
     @PutMapping("/update-status/{idPesanan}")
-    public ResponseEntity<Pesanan> updateStatusPesanan(@PathVariable("idPesanan") long idPesanan, @RequestBody Map<String, String> payload) {
-        String status = payload.get("status");
-        if (status == null) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Pesanan> updateStatusPesanan(
+            @PathVariable("idPesanan") long idPesanan, 
+            @Valid @RequestBody UpdateStatusRequestDTO requestDTO) {
         try {
-            OrderStatus statusEnum = OrderStatus.valueOf(status.toUpperCase());
+            OrderStatus statusEnum = OrderStatus.valueOf(requestDTO.getStatus().toUpperCase());
             Pesanan pesanan = pesananService.updateStatusPesanan(idPesanan, statusEnum.getStatus());
             return ResponseEntity.ok(pesanan);
         } catch (IllegalArgumentException e) {
@@ -115,17 +114,15 @@ public class PesananController {
     }
 
     @PostMapping("/ambil-pesanan/{idPesanan}")
-    public ResponseEntity<Pesanan> ambilPesanan(@PathVariable("idPesanan") long idPesanan, @RequestBody Map<String, Object> payload) {
-        long estimasiHarga;
-        int estimasiWaktu;
+    public ResponseEntity<Pesanan> ambilPesanan(
+            @PathVariable("idPesanan") long idPesanan, 
+            @Valid @RequestBody AmbilPesananRequestDTO requestDTO) {
         try {
-            estimasiHarga = Long.parseLong(payload.get("estimasiHarga").toString());
-            estimasiWaktu = Integer.parseInt(payload.get("estimasiWaktu").toString());
-        } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().build();
-        }
-        try {
-            AmbilPesananCommand command = new AmbilPesananCommand(pesananService, idPesanan, estimasiHarga, estimasiWaktu);
+            AmbilPesananCommand command = new AmbilPesananCommand(
+                pesananService, 
+                idPesanan, 
+                requestDTO.getEstimasiHarga(), 
+                requestDTO.getEstimasiWaktu());
             Pesanan updatedPesanan = command.execute();
             return ResponseEntity.ok(updatedPesanan);
         } catch (RuntimeException e) {

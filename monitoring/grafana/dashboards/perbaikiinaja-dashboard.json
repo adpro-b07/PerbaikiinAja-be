@@ -1,0 +1,37 @@
+{
+  "dashboard": {
+    "title": "PerbaikiinAja Monitoring",
+    "panels": [
+      {
+        "title": "Pesanan Created Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(pesanan_created_total[5m])",
+            "legendFormat": "Pesanan/sec"
+          }
+        ]
+      },
+      {
+        "title": "HTTP Request Duration",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(http_server_requests_seconds_bucket[5m]))",
+            "legendFormat": "95th percentile"
+          }
+        ]
+      },
+      {
+        "title": "Kupon Usage",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "kupon_used_total",
+            "legendFormat": "Total Kupon Used"
+          }
+        ]
+      }
+    ]
+  }
+}

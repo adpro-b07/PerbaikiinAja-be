@@ -1,22 +1,21 @@
 package com.advprog.perbaikiinaja.controller;
 
-import java.util.Map;
+import com.advprog.perbaikiinaja.dto.CreateLaporanTeknisiRequestDTO;
+import com.advprog.perbaikiinaja.dto.UpdateLaporanTeknisiRequestDTO;
+import com.advprog.perbaikiinaja.model.LaporanTeknisi;
+import com.advprog.perbaikiinaja.model.User;
+import com.advprog.perbaikiinaja.service.LaporanTeknisiService;
+import com.advprog.perbaikiinaja.service.UserService;
+
+import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-import com.advprog.perbaikiinaja.model.LaporanTeknisi;
-import com.advprog.perbaikiinaja.model.User;
-import com.advprog.perbaikiinaja.service.LaporanTeknisiService;
-import com.advprog.perbaikiinaja.service.UserService;
+import java.util.List;
 
 @Controller
 @RequestMapping("api/laporan-teknisi")
@@ -27,93 +26,76 @@ public class LaporanTeknisiController {
 
     @Autowired
     private UserService userService;
-    
-    @GetMapping
-    public ResponseEntity<Iterable<LaporanTeknisi>> getAllLaporanTeknisi() {
-
-        try {
-            Iterable<LaporanTeknisi> laporanTeknisi = laporanTeknisiService.getAllLaporanTeknisi();
-            return ResponseEntity.ok(laporanTeknisi);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @GetMapping("/get/{idPesanan}")
-    public ResponseEntity<LaporanTeknisi> getLaporanTeknisiByIdPesanan(@PathVariable("idPesanan") long idPesanan) {
-        try {            
-            LaporanTeknisi LaporanTeknisi = laporanTeknisiService.getLaporanTeknisiByPesananId(idPesanan);
-            return ResponseEntity.ok(LaporanTeknisi);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
 
     @PostMapping("/create/{idPesanan}")
-    public ResponseEntity<LaporanTeknisi> createLaporanTeknisi(@RequestBody Map<String, String> payload, @PathVariable("idPesanan") long idPesanan) {
-        String laporan = payload.get("laporan");
-        String emailTeknisi = payload.get("emailTeknisi");
-
-        if (laporan == null || emailTeknisi == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        
-        User user = userService.findByEmail(emailTeknisi);
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-
-        if (!user.getRole().equals("Teknisi")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
+    public ResponseEntity<LaporanTeknisi> createLaporanTeknisi(
+            @PathVariable("idPesanan") long idPesanan,
+            @Valid @RequestBody CreateLaporanTeknisiRequestDTO requestDTO) {
         try {
-            LaporanTeknisi LaporanTeknisi = laporanTeknisiService.createLaporanTeknisi(laporan, idPesanan);
-            if (!LaporanTeknisi.getPesanan().getEmailTeknisi().equals(emailTeknisi)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            } 
-            return ResponseEntity.status(HttpStatus.CREATED).body(LaporanTeknisi);
-        } catch (RuntimeException e) {
-            if (e.getMessage().contains("not found")) {
-                return ResponseEntity.notFound().build();
+            // Validate technician role
+            User user = userService.findByEmail(requestDTO.getEmailTeknisi());
+            if (user == null || !"Teknisi".equals(user.getRole())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
+            
+            LaporanTeknisi laporanTeknisi = laporanTeknisiService.createLaporanTeknisi(
+                    requestDTO.getLaporan(), idPesanan);
+            return new ResponseEntity<>(laporanTeknisi, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     @PutMapping("/update/{idPesanan}")
-    public ResponseEntity<LaporanTeknisi> updateLaporanTeknisi(@RequestBody Map<String, String> payload, @PathVariable("idPesanan") long idPesanan) {
-        String laporan = payload.get("laporan");
-        
-        if (laporan == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        
+    public ResponseEntity<LaporanTeknisi> updateLaporanTeknisi(
+            @PathVariable("idPesanan") long idPesanan,
+            @Valid @RequestBody UpdateLaporanTeknisiRequestDTO requestDTO) {
         try {
-            LaporanTeknisi laporanTeknisi = laporanTeknisiService.updateLaporanTeknisi(idPesanan, laporan);
+            LaporanTeknisi laporanTeknisi = laporanTeknisiService.updateLaporanTeknisi(
+                    idPesanan, requestDTO.getLaporan());
             return ResponseEntity.ok(laporanTeknisi);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
-    @GetMapping("/teknisi/{email}")
-    public ResponseEntity<Iterable<LaporanTeknisi>> getLaporanTeknisiByTeknisi(@PathVariable String email) {
+    @GetMapping
+    public ResponseEntity<List<LaporanTeknisi>> getAllLaporanTeknisi() {
         try {
-            Iterable<LaporanTeknisi> laporanTeknisi = laporanTeknisiService.getLaporanTeknisiByTeknisi(email);
-            return ResponseEntity.ok(laporanTeknisi);
+            List<LaporanTeknisi> laporanTeknisiList = laporanTeknisiService.getAllLaporanTeknisi();
+            return ResponseEntity.ok(laporanTeknisiList);
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
-    @GetMapping("/pengguna/{email}")
-    public ResponseEntity<Iterable<LaporanTeknisi>> getLaporanTeknisiByPengguna(@PathVariable String email) {
+
+    @GetMapping("/teknisi/{email}")
+    public ResponseEntity<List<LaporanTeknisi>> getLaporanTeknisiByTeknisi(@PathVariable("email") String email) {
         try {
-            Iterable<LaporanTeknisi> LaporanTeknisis = laporanTeknisiService.getLaporanTeknisiByPengguna(email);
-            return ResponseEntity.ok(LaporanTeknisis);
+            List<LaporanTeknisi> laporanTeknisiList = laporanTeknisiService.getLaporanTeknisiByTeknisi(email);
+            return ResponseEntity.ok(laporanTeknisiList);
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @GetMapping("/pengguna/{email}")
+    public ResponseEntity<List<LaporanTeknisi>> getLaporanTeknisiByPengguna(@PathVariable("email") String email) {
+        try {
+            List<LaporanTeknisi> laporanTeknisiList = laporanTeknisiService.getLaporanTeknisiByPengguna(email);
+            return ResponseEntity.ok(laporanTeknisiList);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @GetMapping("/pesanan/{idPesanan}")
+    public ResponseEntity<LaporanTeknisi> getLaporanTeknisiByPesananId(@PathVariable("idPesanan") long idPesanan) {
+        try {
+            LaporanTeknisi laporanTeknisi = laporanTeknisiService.getLaporanTeknisiByPesananId(idPesanan);
+            return ResponseEntity.ok(laporanTeknisi);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }

@@ -1,5 +1,8 @@
 package com.advprog.perbaikiinaja.controller;
 
+import com.advprog.perbaikiinaja.dto.AmbilPesananRequestDTO;
+import com.advprog.perbaikiinaja.dto.CreatePesananRequestDTO;
+import com.advprog.perbaikiinaja.dto.UpdateStatusRequestDTO;
 import com.advprog.perbaikiinaja.enums.OrderStatus;
 import com.advprog.perbaikiinaja.model.PaymentMethod;
 import com.advprog.perbaikiinaja.model.Pesanan;
@@ -15,9 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.*;
@@ -61,12 +62,12 @@ public class PesananControllerTest {
 
     @Test
     public void testCreatePesanan() throws Exception {
-        Map<String, String> request = new HashMap<>();
-        request.put("namaBarang", "Laptop");
-        request.put("kondisiBarang", "Tidak menyala");
-        request.put("kodeKupon", "DISKON10");
-        request.put("emailPengguna", "pengguna@example.com");
-        request.put("metodePembayaran", "Transfer Bank");
+        CreatePesananRequestDTO requestDTO = new CreatePesananRequestDTO();
+        requestDTO.setNamaBarang("Laptop");
+        requestDTO.setKondisiBarang("Tidak menyala");
+        requestDTO.setKodeKupon("DISKON10");
+        requestDTO.setEmailPengguna("pengguna@example.com");
+        requestDTO.setMetodePembayaran("Transfer Bank");
 
         when(pesananService.createPesanan(
                 anyString(), anyString(), anyString(), anyString(), anyString())
@@ -74,7 +75,7 @@ public class PesananControllerTest {
 
         mockMvc.perform(post("/api/pesanan/create")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.namaBarang").value("Laptop"))
                 .andExpect(jsonPath("$.kondisiBarang").value("Tidak menyala"));
@@ -133,8 +134,8 @@ public class PesananControllerTest {
 
     @Test
     public void testUpdateStatusPesanan() throws Exception {
-        Map<String, String> request = new HashMap<>();
-        request.put("status", OrderStatus.DIKERJAKAN.name());
+        UpdateStatusRequestDTO requestDTO = new UpdateStatusRequestDTO();
+        requestDTO.setStatus(OrderStatus.DIKERJAKAN.name());
 
         Pesanan updatedPesanan = new Pesanan();
         updatedPesanan.setId(1L);
@@ -146,7 +147,7 @@ public class PesananControllerTest {
 
         mockMvc.perform(put("/api/pesanan/update-status/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.statusPesanan").value(OrderStatus.DIKERJAKAN.getStatus()));
 
@@ -163,9 +164,9 @@ public class PesananControllerTest {
 
     @Test
     public void testAmbilPesanan() throws Exception {
-        Map<String, Object> request = new HashMap<>();
-        request.put("estimasiHarga", 250000);
-        request.put("estimasiWaktu", 3);
+        AmbilPesananRequestDTO requestDTO = new AmbilPesananRequestDTO();
+        requestDTO.setEstimasiHarga(250000L);
+        requestDTO.setEstimasiWaktu(3);
 
         Pesanan updatedPesanan = new Pesanan();
         updatedPesanan.setId(1L);
@@ -179,7 +180,7 @@ public class PesananControllerTest {
 
         mockMvc.perform(post("/api/pesanan/ambil-pesanan/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.harga").value(250000))
                 .andExpect(jsonPath("$.statusPesanan").value(OrderStatus.WAITING_PENGGUNA.getStatus()));

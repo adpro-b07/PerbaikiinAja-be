@@ -73,7 +73,7 @@ public class LaporanTeknisiControllerTest {
     
     // Update mock to return a user with role "pengguna" to pass the role check in controller
     Pengguna teknisiUser = new Pengguna("1", "Teknisi", "teknisi@example.com", "password", "08123456789", "alamat");
-    teknisiUser.setRole("pengguna"); // Controller checks for this role specifically
+    teknisiUser.setRole("Teknisi"); // Controller checks for this role specifically
     when(userService.findByEmail("teknisi@example.com")).thenReturn(teknisiUser);
     
     // Make sure the mocked LaporanTeknisi has the correct pesanan with matching emailTeknisi

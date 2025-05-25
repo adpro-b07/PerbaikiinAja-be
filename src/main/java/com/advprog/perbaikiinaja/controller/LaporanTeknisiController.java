@@ -63,7 +63,7 @@ public class LaporanTeknisiController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
-        if (!user.getRole().equals("pengguna")) {
+        if (!user.getRole().equals("Teknisi")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 

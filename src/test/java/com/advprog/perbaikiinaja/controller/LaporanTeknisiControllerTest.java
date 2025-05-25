@@ -1,5 +1,7 @@
 package com.advprog.perbaikiinaja.controller;
 
+import com.advprog.perbaikiinaja.dto.CreateLaporanTeknisiRequestDTO;
+import com.advprog.perbaikiinaja.dto.UpdateLaporanTeknisiRequestDTO;
 import com.advprog.perbaikiinaja.model.Pesanan;
 import com.advprog.perbaikiinaja.model.LaporanTeknisi;
 import com.advprog.perbaikiinaja.service.LaporanTeknisiService;
@@ -17,9 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.*;
@@ -66,40 +66,40 @@ public class LaporanTeknisiControllerTest {
 
     @Test
     public void testCreateLaporanTeknisi() throws Exception {
-    // Change from Map<String, Object> to Map<String, String> to match controller parameter type
-    Map<String, String> request = new HashMap<>();
-    request.put("laporan", "Memperbaiki HP dengan mengganti LCD");
-    request.put("emailTeknisi", "teknisi@example.com");
-    
-    // Update mock to return a user with role "pengguna" to pass the role check in controller
-    Pengguna teknisiUser = new Pengguna("1", "Teknisi", "teknisi@example.com", "password", "08123456789", "alamat");
-    teknisiUser.setRole("Teknisi"); // Controller checks for this role specifically
-    when(userService.findByEmail("teknisi@example.com")).thenReturn(teknisiUser);
-    
-    // Make sure the mocked LaporanTeknisi has the correct pesanan with matching emailTeknisi
-    Pesanan pesananWithCorrectEmail = new Pesanan();
-    pesananWithCorrectEmail.setId(1L);
-    pesananWithCorrectEmail.setEmailTeknisi("teknisi@example.com");
-    
-    LaporanTeknisi mockedLaporan = new LaporanTeknisi("Memperbaiki HP dengan mengganti LCD", pesananWithCorrectEmail);
-    mockedLaporan.setId(1L);
-    
-    when(laporanTeknisiService.createLaporanTeknisi(anyString(), anyLong())).thenReturn(mockedLaporan);
+        // Use CreateLaporanTeknisiRequestDTO instead of Map
+        CreateLaporanTeknisiRequestDTO requestDTO = new CreateLaporanTeknisiRequestDTO();
+        requestDTO.setLaporan("Memperbaiki HP dengan mengganti LCD");
+        requestDTO.setEmailTeknisi("teknisi@example.com");
+        
+        // Update mock to return a user with role "pengguna" to pass the role check in controller
+        Pengguna teknisiUser = new Pengguna("1", "Teknisi", "teknisi@example.com", "password", "08123456789", "alamat");
+        teknisiUser.setRole("Teknisi"); // Controller checks for this role specifically
+        when(userService.findByEmail("teknisi@example.com")).thenReturn(teknisiUser);
+        
+        // Make sure the mocked LaporanTeknisi has the correct pesanan with matching emailTeknisi
+        Pesanan pesananWithCorrectEmail = new Pesanan();
+        pesananWithCorrectEmail.setId(1L);
+        pesananWithCorrectEmail.setEmailTeknisi("teknisi@example.com");
+        
+        LaporanTeknisi mockedLaporan = new LaporanTeknisi("Memperbaiki HP dengan mengganti LCD", pesananWithCorrectEmail);
+        mockedLaporan.setId(1L);
+        
+        when(laporanTeknisiService.createLaporanTeknisi(anyString(), anyLong())).thenReturn(mockedLaporan);
 
-    mockMvc.perform(post("/api/laporan-teknisi/create/1")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.laporan").value("Memperbaiki HP dengan mengganti LCD"));
+        mockMvc.perform(post("/api/laporan-teknisi/create/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.laporan").value("Memperbaiki HP dengan mengganti LCD"));
 
-    verify(laporanTeknisiService).createLaporanTeknisi(anyString(), anyLong());
-}
+        verify(laporanTeknisiService).createLaporanTeknisi(anyString(), anyLong());
+    }
 
     @Test
     public void testUpdateLaporanTeknisi() throws Exception {
-        Map<String, Object> request = new HashMap<>();
-        request.put("laporan", "Laporan Teknisi update");
-        request.put("pesananId", 1L);
+        // Use UpdateLaporanTeknisiRequestDTO instead of Map
+        UpdateLaporanTeknisiRequestDTO requestDTO = new UpdateLaporanTeknisiRequestDTO();
+        requestDTO.setLaporan("Laporan Teknisi update");
 
         LaporanTeknisi updatedLaporanTeknisi = new LaporanTeknisi("Laporan Teknisi update", dummyPesanan);
         updatedLaporanTeknisi.setId(1L);
@@ -108,7 +108,7 @@ public class LaporanTeknisiControllerTest {
 
         mockMvc.perform(put("/api/laporan-teknisi/update/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.laporan").value("Laporan Teknisi update"));
 

@@ -11,4 +11,5 @@ public interface ReportService {
     List<Report> getReportsByTeknisi(String emailTeknisi);
     List<Report> getReportsByPengguna(String emailPengguna);
     List<Report> findByTeknisi(String emailTeknisi);
+    void deleteReport(Long id);
 }

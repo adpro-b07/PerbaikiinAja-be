@@ -70,4 +70,11 @@ public class ReportServiceImpl implements ReportService {
     public List<Report> findByTeknisi(String emailTeknisi) {
         return reportRepository.findByPesanan_EmailTeknisi(emailTeknisi);
     }
+
+    @Override
+public void deleteReport(Long id) {
+        Report report = reportRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Report not found with ID: " + id));
+        reportRepository.delete(report);
+    }
 }
